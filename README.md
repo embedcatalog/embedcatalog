@@ -51,3 +51,7 @@ Thanks to everyone who helps make it better!
 ## License
 
 Source code released under the AGPL-3.0 license.
+
+---
+
+<div align="center">The application code is completely open source 🌱!</div>
