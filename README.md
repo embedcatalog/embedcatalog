@@ -44,7 +44,10 @@ Platforms like these often generate negative reviews, but this platform is simpl
 
 ## Tech stack
 
-Next.js v16 (App Router) + Tailwind v4 + Data in JSON format
+- Next.js v16 (App Router)
+- Tailwind v4
+- Data in JSON format
+- ShadCN
 
 ## Contribution
 
