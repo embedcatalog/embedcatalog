@@ -80,6 +80,29 @@ export default function SubmitPage() {
         </p>
       </div>
 
+      <div className="mt-8 rounded-xl border p-5">
+        <div className="flex items-center justify-between text-sm">
+          <span className="font-medium">Projects added</span>
+          <span className="tabular-nums text-muted-foreground">0 of 15</span>
+        </div>
+        <div
+          className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
+          role="progressbar"
+          aria-valuenow={0}
+          aria-valuemin={0}
+          aria-valuemax={15}
+        >
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: "0%" }}
+          />
+        </div>
+        <p className="mt-3 text-sm text-muted-foreground">
+          In July 2026, due to the volume of work, we&rsquo;ll be able to add the
+          first fifteen projects.
+        </p>
+      </div>
+
       <div className="mt-8 rounded-xl border p-5 text-left">
         <p className="text-sm font-medium">In your message, please include</p>
         <p className="mt-1 text-sm text-muted-foreground">
