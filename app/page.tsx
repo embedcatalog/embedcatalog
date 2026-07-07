@@ -25,7 +25,7 @@ const projects = projectsData as Project[]
 export const metadata: Metadata = {
   title: "Promote your projects",
   description:
-    "A space to promote your projects on social media. Get featured in articles, tweets and other platforms — submit once, no subscription.",
+    "A place to promote your projects on social media. Get featured in articles, tweets and other platforms — submit once, no subscription.",
   keywords: [
     "promote project",
     "project promotion",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `Promote your projects | ${siteConfig.name}`,
     description:
-      "A space to promote your projects on social media. Get featured in articles, tweets and other platforms — submit once, no subscription.",
+      "A place to promote your projects on social media. Get featured in articles, tweets and other platforms — submit once, no subscription.",
     url: "/",
   },
 }
@@ -120,7 +120,7 @@ export default function Page() {
             Get discovered.
           </span>
           <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-            A space to promote your projects
+            A place to promote your projects
           </h1>
           <p className="mt-4 max-w-xl text-lg text-pretty text-muted-foreground">
             Share them on social media with the help of our platform.
