@@ -8,7 +8,9 @@ import { ArrowLeft } from "lucide-react"
 import { Badge } from "components/ui/badge"
 import { Button } from "components/ui/button"
 import { CopyBlock } from "components/copy-block"
+import { CopyLinkButton } from "components/copy-link-button"
 import { ImageCarousel } from "components/image-carousel"
+import { ProjectGithubStats } from "components/project-github-stats"
 import { type Project } from "components/projects-grid"
 import projectsData from "data/projects.json"
 import { siteConfig } from "lib/site"
@@ -148,6 +150,8 @@ export default async function ProjectPage({
             </div>
           )}
 
+          <CopyLinkButton path={`/projects/${project.slug}`} />
+
           <Button asChild>
             <a href={project.url} target="_blank" rel="noreferrer noopener">
               Link
@@ -155,6 +159,10 @@ export default async function ProjectPage({
           </Button>
         </div>
       </div>
+
+      {project.socials?.github && (
+        <ProjectGithubStats githubUrl={project.socials.github} />
+      )}
 
       <div className="mt-6">
         <ImageCarousel images={project.images} alt={project.name} />

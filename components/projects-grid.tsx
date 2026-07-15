@@ -14,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "components/ui/card"
+import { ProjectCardStars } from "components/project-card-stars"
 
 function TwitterIcon(props: React.ComponentProps<"svg">) {
   return (
@@ -137,43 +138,44 @@ function ProjectsGrid({
           </CardContent>
           <CardFooter className="text-muted-foreground mt-auto justify-between text-xs">
             <span>Updated {project.updatedAt}</span>
-            {project.socials && (
-              <div className="relative z-10 flex items-center gap-0.5">
-                {project.socials.twitter && (
-                  <a
-                    href={project.socials.twitter}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    aria-label={`${project.name} on X`}
-                    className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
-                  >
-                    <TwitterIcon className="size-4" />
-                  </a>
-                )}
-                {project.socials.youtube && (
-                  <a
-                    href={project.socials.youtube}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    aria-label={`${project.name} on YouTube`}
-                    className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
-                  >
-                    <YoutubeIcon className="size-4" />
-                  </a>
-                )}
-                {project.socials.github && (
-                  <a
-                    href={project.socials.github}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    aria-label={`${project.name} on GitHub`}
-                    className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
-                  >
-                    <GithubIcon className="size-4" />
-                  </a>
-                )}
-              </div>
-            )}
+            <div className="relative z-10 flex items-center gap-0.5">
+              {project.socials?.github && (
+                <ProjectCardStars githubUrl={project.socials.github} />
+              )}
+              {project.socials?.twitter && (
+                <a
+                  href={project.socials.twitter}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={`${project.name} on X`}
+                  className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
+                >
+                  <TwitterIcon className="size-4" />
+                </a>
+              )}
+              {project.socials?.youtube && (
+                <a
+                  href={project.socials.youtube}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={`${project.name} on YouTube`}
+                  className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
+                >
+                  <YoutubeIcon className="size-4" />
+                </a>
+              )}
+              {project.socials?.github && (
+                <a
+                  href={project.socials.github}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={`${project.name} on GitHub`}
+                  className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
+                >
+                  <GithubIcon className="size-4" />
+                </a>
+              )}
+            </div>
           </CardFooter>
         </Card>
       ))}
