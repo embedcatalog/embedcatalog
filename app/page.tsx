@@ -48,7 +48,7 @@ export default function Page() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold">
           Projects{" "}
-          <span className="text-muted-foreground font-normal">
+          <span className="font-normal text-muted-foreground">
             ({projects.length})
           </span>
         </h1>
