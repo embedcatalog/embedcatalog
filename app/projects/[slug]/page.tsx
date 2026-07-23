@@ -103,9 +103,14 @@ export default async function ProjectPage({
 
       <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-2">
+            {(project.premium || project.isNew) && (
+              <div className="mb-1 flex items-center gap-2">
+                {project.premium && <Embed variant="secondary">Premium</Embed>}
+                {project.isNew && <Embed>New</Embed>}
+              </div>
+            )}
             <h1 className="text-2xl font-semibold">{project.name}</h1>
-            {project.isNew && <Embed>New</Embed>}
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
             Updated {project.updatedAt}

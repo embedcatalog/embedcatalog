@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   keywords: [
     "projects",
-    "project directory",
+    "project catalog",
     "project showcase",
     "submit project",
     "developer tools",

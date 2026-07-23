@@ -57,6 +57,7 @@ export type Project = {
   name: string
   description: string
   isNew: boolean
+  premium?: boolean
   url: string
   images: string[]
   tags: string[]
@@ -107,10 +108,19 @@ function ProjectsGrid({
           )}
 
           <CardHeader>
-            <CardTitle>{project.name}</CardTitle>
+            <CardTitle className="flex flex-col items-start gap-2">
+              {(project.premium || project.isNew) && (
+                <div className="mb-1 flex items-center gap-2">
+                  {project.premium && (
+                    <Embed variant="secondary">Premium</Embed>
+                  )}
+                  {project.isNew && <Embed>New</Embed>}
+                </div>
+              )}
+              <span>{project.name}</span>
+            </CardTitle>
             <CardDescription>{project.description}</CardDescription>
             <CardAction className="relative z-10 flex items-center gap-2">
-              {project.isNew && <Embed>New</Embed>}
               <a
                 href={project.url}
                 target="_blank"

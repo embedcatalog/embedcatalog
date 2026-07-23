@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Explore all projects. Filter by status and tags, and search by name or description.",
   keywords: [
     "projects",
-    "project directory",
+    "project catalog",
     "filter projects",
     "tags",
     "status",

@@ -5,6 +5,7 @@
     "name": "HMPL",
     "description": "Lightweight server-oriented template language for JavaScript.",
     "isNew": true,
+    "premium": true,
     "url": "https://hmpl-lang.dev",
     "images": [
       "/images/hmpl/photo1.png",

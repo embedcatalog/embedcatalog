@@ -3,7 +3,13 @@ import { siteConfig } from "lib/site"
 import { type Project } from "components/projects-grid"
 
 export type EmbedTheme = "light" | "dark"
-export type EmbedKind = "license" | "added"
+export type EmbedKind = "license" | "added" | "organization"
+
+type GithubRepoMeta = {
+  license: string | null
+  organization: string | null
+  createdAt: string | null
+}
 
 const themes = {
   light: {
@@ -18,19 +24,33 @@ const themes = {
   },
 } as const
 
-const embedKinds: EmbedKind[] = ["license", "added"]
+const embedKinds: EmbedKind[] = ["license", "added", "organization"]
 const embedThemes: EmbedTheme[] = ["light", "dark"]
 
-async function fetchProjectLicense(
-  githubUrl: string | undefined
-): Promise<string | null> {
-  if (!githubUrl) {
+function formatCreatedMonth(iso: string) {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) {
     return null
+  }
+  return date.toLocaleString("en-US", { month: "short", year: "numeric" })
+}
+
+async function fetchGithubRepoMeta(
+  githubUrl: string | undefined
+): Promise<GithubRepoMeta> {
+  const empty: GithubRepoMeta = {
+    license: null,
+    organization: null,
+    createdAt: null,
+  }
+
+  if (!githubUrl) {
+    return empty
   }
 
   const repo = parseGithubRepo(githubUrl)
   if (!repo) {
-    return null
+    return empty
   }
 
   try {
@@ -39,35 +59,57 @@ async function fetchProjectLicense(
       cache: "force-cache",
     })
     if (!res.ok) {
-      return null
+      return empty
     }
 
     const data = (await res.json()) as {
       license?: { spdx_id?: string | null } | null
+      owner?: { login?: string | null } | null
+      created_at?: string | null
     }
+
     const spdx = data.license?.spdx_id
-    if (!spdx || spdx === "NOASSERTION") {
-      return null
-    }
-    return spdx
+    const license =
+      spdx && spdx !== "NOASSERTION" ? spdx : null
+    const organization = data.owner?.login ?? null
+    const createdAt = data.created_at
+      ? formatCreatedMonth(data.created_at)
+      : null
+
+    return { license, organization, createdAt }
   } catch {
-    return null
+    return empty
   }
 }
 
-async function getEmbedText(
+function parseEmbedKind(kind: string): EmbedKind {
+  if (kind === "added") {
+    return "added"
+  }
+  if (kind === "organization") {
+    return "organization"
+  }
+  return "license"
+}
+
+async function getEmbedLines(
   project: Project,
   kind: EmbedKind
-): Promise<string> {
+): Promise<string[]> {
   if (kind === "added") {
-    return `Added to: ${siteConfig.name}`
+    return [`Added to: ${siteConfig.name}`]
   }
 
-  const license = await fetchProjectLicense(project.socials?.github)
-  if (license) {
-    return `License: ${license}`
+  const meta = await fetchGithubRepoMeta(project.socials?.github)
+
+  if (kind === "organization") {
+    return [
+      `Organization: ${meta.organization ?? "Unknown"}`,
+      `Created: ${meta.createdAt ?? "Unknown"}`,
+    ]
   }
-  return `License: Unknown`
+
+  return [`License: ${meta.license ?? "Unknown"}`]
 }
 
 function getEmbedTheme(theme: EmbedTheme) {
@@ -75,18 +117,34 @@ function getEmbedTheme(theme: EmbedTheme) {
 }
 
 function getEmbedSize(kind: EmbedKind) {
+  if (kind === "organization") {
+    return { width: 200, height: 48 }
+  }
   if (kind === "added") {
     return { width: 200, height: 28 }
   }
   return { width: 160, height: 28 }
 }
 
+function getPublicEmbedSrc(
+  siteUrl: string,
+  slug: string,
+  kind: EmbedKind,
+  theme: EmbedTheme
+) {
+  // Static hosts ignore ?theme= for file lookup, so dark uses a -dark file.
+  const file = theme === "dark" ? `${kind}-dark.png` : `${kind}.png`
+  return `${siteUrl}/embed/${slug}/${file}?theme=${theme}`
+}
+
 export {
   embedKinds,
   embedThemes,
-  fetchProjectLicense,
+  fetchGithubRepoMeta,
+  getEmbedLines,
   getEmbedSize,
-  getEmbedText,
   getEmbedTheme,
+  getPublicEmbedSrc,
+  parseEmbedKind,
   themes,
 }

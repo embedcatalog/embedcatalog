@@ -4,6 +4,7 @@ import Link from "next/link"
 import {
   ArrowUpRight,
   Check,
+  Code2,
   Newspaper,
   PlusCircle,
   Share2,
@@ -21,7 +22,7 @@ const TWITTER_URL = "https://x.com/aanthonymax"
 export const metadata: Metadata = {
   title: "Submit a project",
   description:
-    "Get your project listed. Start free or go featured for $40 — promotion in articles, X posts and other platforms.",
+    "Get your project listed. Start free or go premium for $40 — promotion in articles, X posts and other platforms.",
   keywords: [
     "submit project",
     "list project",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: `Submit a project | ${siteConfig.name}`,
     description:
-      "Get your project listed. Start free or go featured for $40 — promotion in articles, X posts and other platforms.",
+      "Get your project listed. Start free or go premium for $40 — promotion in articles, X posts and other platforms.",
     url: "/submit",
   },
 }
@@ -85,11 +86,11 @@ const plans: Plan[] = [
     name: "Free",
     price: "$0",
     period: "forever",
-    description: "Get listed in the directory so people can find your project.",
-    features: ["Listed on the platform", "Discoverable in the directory"],
+    description: "Get listed in the catalog so people can find your project.",
+    features: ["Listed on the platform", "Discoverable in the catalog"],
   },
   {
-    name: "Featured",
+    name: "Premium",
     price: "$40",
     period: "one-time",
     description: "Full promotion through articles, X, and other platforms.",
@@ -98,6 +99,7 @@ const plans: Plan[] = [
       "Featured in curated articles",
       "Promotion in X (Twitter) posts",
       "Promotion on other platforms",
+      "Premium embeds",
     ],
     highlighted: true,
   },
@@ -140,10 +142,16 @@ const offerings: Offering[] = [
       "Your project is shared in other relevant channels and communities (Medium, daily.dev, etc).",
   },
   {
+    icon: Code2,
+    title: "Premium embeds",
+    description:
+      "Get exclusive embed badges for your README and website — organization, created date, and more.",
+  },
+  {
     icon: PlusCircle,
     title: "Listed on the platform",
     description:
-      "Your project is added to the directory so people can discover it any time.",
+      "Your project is added to the catalog so people can discover it any time.",
   },
 ]
 
@@ -178,11 +186,6 @@ export default function SubmitPage() {
                 )}
                 <h2 className="font-medium">{plan.name}</h2>
               </div>
-              {plan.highlighted && (
-                <span className="rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  Recommended
-                </span>
-              )}
             </div>
             <div className="mt-4 flex items-baseline gap-1.5">
               <span className="text-4xl font-semibold tracking-tight">

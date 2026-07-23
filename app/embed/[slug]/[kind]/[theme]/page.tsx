@@ -2,7 +2,12 @@ import { notFound, redirect } from "next/navigation"
 
 import { type Project } from "components/projects-grid"
 import projectsData from "data/projects.json"
-import { embedKinds, embedThemes } from "lib/embed"
+import {
+  embedKinds,
+  embedThemes,
+  type EmbedKind,
+  type EmbedTheme,
+} from "lib/embed"
 
 const projects = projectsData as Project[]
 
@@ -30,8 +35,8 @@ export default async function EmbedPage({
 
   if (
     !project ||
-    !embedKinds.includes(kind as "license" | "added") ||
-    !embedThemes.includes(theme as "light" | "dark")
+    !embedKinds.includes(kind as EmbedKind) ||
+    !embedThemes.includes(theme as EmbedTheme)
   ) {
     notFound()
   }

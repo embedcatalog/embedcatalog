@@ -41,20 +41,20 @@ const sections: Section[] = [
       {
         type: "ul",
         items: [
-          "Free — your project is added to the directory so people can discover it on the platform. No payment is required.",
-          "Featured — a one-time fee of $40 USD. Includes everything in the Free plan, plus promotion in curated articles, X (Twitter) posts, and other relevant channels.",
+          "Free — your project is added to the catalog so people can discover it on the platform. No payment is required.",
+          "Premium — a one-time fee of $40 USD. Includes everything in the Free plan, plus promotion in curated articles, X (Twitter) posts, and other relevant channels, as well as premium embeds.",
         ],
       },
       {
         type: "p",
-        text: "The paid fee covers the time spent reviewing, preparing, publishing, and promoting your project beyond basic directory listing.",
+        text: "The paid fee covers the time spent reviewing, preparing, publishing, and promoting your project beyond basic catalog listing.",
       },
     ],
   },
   {
     title: "2. Refund Policy",
     blocks: [
-      { type: "p", text: "All payments for the Featured plan are final." },
+      { type: "p", text: "All payments for the Premium plan are final." },
       {
         type: "p",
         text: "Because the submission fee covers the time spent reviewing, preparing, publishing, and promoting your project, no refunds will be issued after payment has been received, regardless of the number of views, clicks, visitors, sales, or any other results your project may receive.",
@@ -92,11 +92,11 @@ const sections: Section[] = [
     blocks: [
       {
         type: "p",
-        text: "Under the Free plan, your project is listed in the directory and can be discovered by visitors browsing the platform.",
+        text: "Under the Free plan, your project is listed in the catalog and can be discovered by visitors browsing the platform.",
       },
       {
         type: "p",
-        text: "Under the Featured plan, the website owner will make reasonable efforts to publish and promote listed projects through the website and related channels where appropriate, including articles, X posts, and other platforms.",
+        text: "Under the Premium plan, the website owner will make reasonable efforts to publish and promote listed projects through the website and related channels where appropriate, including articles, X posts, and other platforms. Premium projects also receive premium embeds for use on websites and READMEs.",
       },
       {
         type: "p",
@@ -131,7 +131,7 @@ const sections: Section[] = [
       },
       {
         type: "p",
-        text: "Submitting a new or substantially modified project may require a new submission fee if you choose the Featured plan.",
+        text: "Submitting a new or substantially modified project may require a new submission fee if you choose the Premium plan.",
       },
     ],
   },
@@ -151,12 +151,12 @@ export default function SubmissionTermsPage() {
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-semibold">Project Submission Terms</h1>
       <p className="text-muted-foreground mt-2 text-sm">
-        Last updated: July 14, 2026
+        Last updated: July 23, 2026
       </p>
 
       <p className="text-muted-foreground mt-6 leading-relaxed">
         By submitting a project, you agree to the following terms. Projects can
-        be added for free or under the paid Featured plan.
+        be added for free or under the paid Premium plan.
       </p>
 
       <div className="mt-8 flex flex-col gap-8">

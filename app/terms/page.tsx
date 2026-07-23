@@ -7,13 +7,13 @@ const EMAIL = "aanthonymaxgithub@gmail.com"
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "The Terms of Service governing the use of this public project directory website.",
+    "The Terms of Service governing the use of this public project catalog website.",
   keywords: ["terms of service", "terms of use", "legal", "agreement"],
   alternates: { canonical: "/terms" },
   openGraph: {
     title: `Terms of Service | ${siteConfig.name}`,
     description:
-      "The Terms of Service governing the use of this public project directory website.",
+      "The Terms of Service governing the use of this public project catalog website.",
     url: "/terms",
   },
 }
@@ -22,7 +22,7 @@ const sections = [
   {
     title: "1. Purpose of the Website",
     paragraphs: [
-      "This website is an online public directory of projects. The website displays publicly available information, including project names, descriptions, images, and links to third-party websites.",
+      "This website is an online public catalog of projects. The website displays publicly available information, including project names, descriptions, images, and links to third-party websites.",
     ],
   },
   {

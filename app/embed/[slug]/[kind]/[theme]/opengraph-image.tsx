@@ -7,10 +7,10 @@ import projectsData from "data/projects.json"
 import {
   embedKinds,
   embedThemes,
+  getEmbedLines,
   getEmbedSize,
-  getEmbedText,
   getEmbedTheme,
-  type EmbedKind,
+  parseEmbedKind,
   type EmbedTheme,
 } from "lib/embed"
 import { siteConfig } from "lib/site"
@@ -39,15 +39,17 @@ export default async function EmbedImage({
   params: Promise<{ slug: string; kind: string; theme: string }>
 }) {
   const { slug, kind: kindParam, theme: themeParam } = await params
-  const kind: EmbedKind = kindParam === "added" ? "added" : "license"
+  const kind = parseEmbedKind(kindParam)
   const theme: EmbedTheme = themeParam === "dark" ? "dark" : "light"
   const size = getEmbedSize(kind)
   const project = projects.find((item) => item.slug === slug)
-  const text = project
-    ? await getEmbedText(project, kind)
+  const lines = project
+    ? await getEmbedLines(project, kind)
     : kind === "added"
-      ? `Added to: ${siteConfig.name}`
-      : "License: Unknown"
+      ? [`Added to: ${siteConfig.name}`]
+      : kind === "organization"
+        ? ["Organization: Unknown", "Created: Unknown"]
+        : ["License: Unknown"]
   const colors = getEmbedTheme(theme)
 
   const font = await readFile(
@@ -66,21 +68,34 @@ export default async function EmbedImage({
           background: colors.background,
           border: `1px solid ${colors.border}`,
           borderRadius: 4,
-          paddingLeft: 10,
-          paddingRight: 10,
+          paddingLeft: 12,
+          paddingRight: 12,
         }}
       >
         <div
           style={{
             display: "flex",
-            color: colors.text,
-            fontSize: 12,
-            fontWeight: 600,
-            fontFamily: "Geist SemiBold",
-            whiteSpace: "nowrap",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: lines.length > 1 ? 2 : 0,
           }}
         >
-          {text}
+          {lines.map((line) => (
+            <div
+              key={line}
+              style={{
+                display: "flex",
+                color: colors.text,
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "Geist SemiBold",
+                whiteSpace: "nowrap",
+                lineHeight: 1.2,
+              }}
+            >
+              {line}
+            </div>
+          ))}
         </div>
       </div>
     ),
