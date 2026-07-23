@@ -126,21 +126,30 @@ function getEmbedSize(kind: EmbedKind) {
   return { width: 160, height: 28 }
 }
 
+function getEmbedFileName(kind: EmbedKind, theme: EmbedTheme = "light") {
+  // license.png (light default)
+  // license.theme-light.png
+  // license.theme-dark.png
+  if (theme === "light") {
+    return `${kind}.png`
+  }
+  return `${kind}.theme-${theme}.png`
+}
+
 function getPublicEmbedSrc(
   siteUrl: string,
   slug: string,
   kind: EmbedKind,
   theme: EmbedTheme
 ) {
-  // Static hosts ignore ?theme= for file lookup, so dark uses a -dark file.
-  const file = theme === "dark" ? `${kind}-dark.png` : `${kind}.png`
-  return `${siteUrl}/embed/${slug}/${file}?theme=${theme}`
+  return `${siteUrl}/embed/${slug}/${getEmbedFileName(kind, theme)}`
 }
 
 export {
   embedKinds,
   embedThemes,
   fetchGithubRepoMeta,
+  getEmbedFileName,
   getEmbedLines,
   getEmbedSize,
   getEmbedTheme,

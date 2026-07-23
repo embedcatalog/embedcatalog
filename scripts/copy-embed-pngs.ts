@@ -1,6 +1,8 @@
 import { copyFile, mkdir, readdir, stat } from "node:fs/promises"
 import { basename, dirname, join } from "node:path"
 
+import { getEmbedFileName, type EmbedKind, type EmbedTheme } from "../lib/embed"
+
 async function walk(dir: string) {
   const entries = await readdir(dir)
   await Promise.all(
@@ -16,17 +18,24 @@ async function walk(dir: string) {
       }
 
       // /embed/{slug}/{kind}/{theme}/opengraph-image
-      // → /embed/{slug}/{kind}.png or {kind}-dark.png
-      const theme = basename(dirname(full))
-      const kind = basename(dirname(dirname(full)))
+      // → /embed/{slug}/license.png
+      // → /embed/{slug}/license.theme-light.png
+      // → /embed/{slug}/license.theme-dark.png
+      const theme = basename(dirname(full)) as EmbedTheme
+      const kind = basename(dirname(dirname(full))) as EmbedKind
       const slugDir = dirname(dirname(dirname(full)))
-      const fileName = theme === "dark" ? `${kind}-dark.png` : `${kind}.png`
 
       await mkdir(slugDir, { recursive: true })
-      await copyFile(full, join(slugDir, fileName))
+      await copyFile(full, join(slugDir, getEmbedFileName(kind, theme)))
+
+      if (theme === "light") {
+        await copyFile(full, join(slugDir, `${kind}.theme-light.png`))
+      }
     })
   )
 }
 
 await walk(join(process.cwd(), "out/embed"))
-console.log("Copied embed images to {kind}.png / {kind}-dark.png")
+console.log(
+  "Copied embed images to {kind}.png / {kind}.theme-light.png / {kind}.theme-dark.png"
+)
