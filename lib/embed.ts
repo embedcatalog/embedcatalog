@@ -69,8 +69,7 @@ async function fetchGithubRepoMeta(
     }
 
     const spdx = data.license?.spdx_id
-    const license =
-      spdx && spdx !== "NOASSERTION" ? spdx : null
+    const license = spdx && spdx !== "NOASSERTION" ? spdx : null
     const organization = data.owner?.login ?? null
     const createdAt = data.created_at
       ? formatCreatedMonth(data.created_at)
@@ -127,9 +126,6 @@ function getEmbedSize(kind: EmbedKind) {
 }
 
 function getEmbedFileName(kind: EmbedKind, theme: EmbedTheme = "light") {
-  // license.png (light default)
-  // license.theme-light.png
-  // license.theme-dark.png
   if (theme === "light") {
     return `${kind}.png`
   }
