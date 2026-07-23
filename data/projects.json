@@ -61,5 +61,157 @@
         "content": "Also, the template language format itself allows you to work with .hmpl extension files if you use Vite or WebPack."
       }
     ]
+  },
+  {
+    "id": "2",
+    "slug": "8bitcn",
+    "name": "8bitcn/ui",
+    "description": "A set of retro-designed, accessible components and a code distribution platform. Open Source. Open Code.",
+    "isNew": true,
+    "url": "https://www.8bitcn.com",
+    "images": ["/images/8bitcn/photo1.png", "/images/8bitcn/photo2.png"],
+    "tags": ["ui", "components", "retro", "8-bit", "shadcn", "react"],
+    "updatedAt": "2026-07-23",
+    "socials": {
+      "github": "https://github.com/TheOrcDev/8bitcn-ui"
+    },
+    "info": [
+      {
+        "type": "text",
+        "content": "8bitcn/ui is an accessible retro UI library. Open source. Copy-paste. Built as a set of retro-designed components and a code distribution platform on top of the shadcn ecosystem."
+      },
+      {
+        "type": "heading",
+        "content": "What you get"
+      },
+      {
+        "type": "text",
+        "content": "A growing collection of rare loot UI pieces: buttons, forms, blocks, and themes with a pixel / 8-bit look. Free to use, open source, and installable the same way you add other shadcn registry components."
+      },
+      {
+        "type": "heading",
+        "content": "Usage example"
+      },
+      {
+        "type": "text",
+        "content": "To add the button component to your project:"
+      },
+      {
+        "type": "code",
+        "content": "npx shadcn@latest add @8bitcn/button"
+      },
+      {
+        "type": "text",
+        "content": "Then import and use it in your app:"
+      },
+      {
+        "type": "code",
+        "content": "import { Button } from \"@/components/ui/8bit\";\n\nexport default function App() {\n  return <Button>Click me</Button>;\n}"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "slug": "videorc",
+    "name": "Videorc",
+    "description": "Open-source AI-native screen recorder & multistream studio — record in 4K, stream live, publish with AI.",
+    "isNew": true,
+    "url": "https://videorc.com",
+    "images": ["/images/videorc/photo1.png"],
+    "tags": ["macos", "screen-recorder", "streaming", "electron", "rust", "ai"],
+    "updatedAt": "2026-07-23",
+    "socials": {
+      "github": "https://github.com/TheOrcDev/videorc",
+      "twitter": "https://x.com/videorc"
+    },
+    "info": [
+      {
+        "type": "text",
+        "content": "Videorc is an open-source, AI-native desktop studio for creators: record your screen and camera, stream to multiple platforms at once, and walk away with a transcript, titles, chapters, and a ready-to-paste publish pack — all from one window."
+      },
+      {
+        "type": "heading",
+        "content": "Why Videorc"
+      },
+      {
+        "type": "text",
+        "content": "Most capture tools make you choose between “simple but shallow” and “powerful but a cockpit”. Videorc aims for the third option: a studio that is genuinely simple to run — pick a scene, hit record — while the heavy lifting (a native capture engine, multi-platform streaming, live captions, post-recording AI) happens underneath."
+      },
+      {
+        "type": "heading",
+        "content": "Highlights"
+      },
+      {
+        "type": "text",
+        "content": "Scenes, not knobs — screen + camera, screen only, camera only, or side-by-side splits with draggable camera placement and framing controls. Record and stream in one pipeline (local MKV/MP4, RTMP, or both), including simulcast to multiple destinations. Live captions with optional burn-in. Post-recording AI for transcripts, titles, chapters, highlights, and a publish pack."
+      },
+      {
+        "type": "heading",
+        "content": "How it works"
+      },
+      {
+        "type": "text",
+        "content": "Electron + React desktop shell for the studio UI. A Rust backend owns capture, composition, recording, and streaming over an authenticated localhost WebSocket. FFmpeg drives encoding. SQLite keeps your session library local on your machine."
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "slug": "shadscan",
+    "name": "shadscan",
+    "description": "Deterministic UI audits for shadcn apps — for your terminal, CI, and AI agent.",
+    "isNew": true,
+    "url": "https://www.shadscan.com",
+    "images": ["/images/shadscan/photo1.png"],
+    "tags": [
+      "shadcn",
+      "cli",
+      "accessibility",
+      "react",
+      "static-analysis",
+      "ci"
+    ],
+    "updatedAt": "2026-07-23",
+    "socials": {
+      "github": "https://github.com/TheOrcDev/shadscan"
+    },
+    "info": [
+      {
+        "type": "text",
+        "content": "Shadscan inspects a React shadcn app, scores its UI fundamentals from 0 to 100, and shows the evidence behind every finding. It catches product details that are easy to postpone: command menus, theme shortcuts, route states, accessible controls, form feedback, metadata, mobile behavior, and more."
+      },
+      {
+        "type": "text",
+        "content": "The default scan is deterministic and read-only. It does not start the app, edit files, call an AI model, upload source, or require application secrets."
+      },
+      {
+        "type": "heading",
+        "content": "Quick start"
+      },
+      {
+        "type": "code",
+        "content": "pnpm dlx @shadscan/cli"
+      },
+      {
+        "type": "text",
+        "content": "Or with npm / Bun: npx --yes @shadscan/cli · bunx @shadscan/cli"
+      },
+      {
+        "type": "heading",
+        "content": "What you get"
+      },
+      {
+        "type": "text",
+        "content": "A scored report across Foundation, Interaction, States, Accessibility, Forms and Data Entry, and Production Polish. Findings are split into Fixes, Decisions, Advisories, and Not applicable — with repository-relative evidence and agent-ready remediation prompts."
+      },
+      {
+        "type": "heading",
+        "content": "CI & agents"
+      },
+      {
+        "type": "code",
+        "content": "# Machine-readable report\npnpm dlx @shadscan/cli --json\n\n# Paste-ready plan for a coding agent\npnpm dlx @shadscan/cli --prompt\n\n# Fail CI below a score floor\npnpm dlx @shadscan/cli --fail-under 80 --no-interactive"
+      }
+    ]
   }
 ]
