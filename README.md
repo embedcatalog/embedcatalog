@@ -6,7 +6,7 @@
 [![embdecatalog](https://embedcatalog.com/embed/hmpl/added.theme-dark.png)](https://embedcatalog.com)
 [![x.com](https://img.shields.io/badge/twitter-000?logo=x&logoColor=fff)](https://x.com/aanthonymax)
 
-This is a free project catalog where you can add yours and get interesting and practical embeds.
+This is a project catalog where you can add yours and get interesting and practical embeds.
 
 **Briefly about the idea**
 
