@@ -46,10 +46,12 @@ export default function Page() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Projects</h1>
-        <p className="text-sm text-muted-foreground">
-          Explore interesting projects.
-        </p>
+        <h1 className="text-2xl font-semibold">
+          Projects{" "}
+          <span className="text-muted-foreground font-normal">
+            ({projects.length})
+          </span>
+        </h1>
       </div>
       <ProjectsView projects={projects} />
     </main>

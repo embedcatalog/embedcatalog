@@ -39,6 +39,7 @@ function MailIcon(props: React.ComponentProps<"svg">) {
 
 const navLinks = [
   { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
   { label: "Submit", href: "/submit" },
 ]
 
