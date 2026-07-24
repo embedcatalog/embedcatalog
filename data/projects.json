@@ -211,7 +211,7 @@
     "id": "5",
     "slug": "browseract",
     "name": "BrowserAct",
-    "description": "BrowserAct is a browser automation CLI built for AI agents.",
+    "description": "Browser automation CLI built for AI agents.",
     "isNew": true,
     "url": "https://www.browseract.com",
     "images": [
