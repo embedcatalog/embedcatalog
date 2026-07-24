@@ -207,15 +207,16 @@ export default async function ProjectPage({
             return (
               <div
                 key={index}
-                className="bg-muted relative aspect-video w-full overflow-hidden rounded-xl border"
+                className="bg-muted w-full overflow-hidden rounded-xl border"
               >
                 <Image
                   src={block.content}
                   alt={project.name}
-                  fill
+                  width={1200}
+                  height={800}
                   unoptimized
                   sizes="(min-width: 768px) 768px, 100vw"
-                  className="object-cover"
+                  className="h-auto w-full"
                 />
               </div>
             )

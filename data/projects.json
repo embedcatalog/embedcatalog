@@ -163,14 +163,7 @@
     "isNew": true,
     "url": "https://www.shadscan.com",
     "images": ["/images/shadscan/photo1.png"],
-    "tags": [
-      "shadcn",
-      "cli",
-      "accessibility",
-      "react",
-      "static-analysis",
-      "ci"
-    ],
+    "tags": ["shadcn", "cli", "react", "static-analysis", "ci"],
     "updatedAt": "2026-07-23",
     "socials": {
       "github": "https://github.com/TheOrcDev/shadscan"
@@ -211,6 +204,106 @@
       {
         "type": "code",
         "content": "# Machine-readable report\npnpm dlx @shadscan/cli --json\n\n# Paste-ready plan for a coding agent\npnpm dlx @shadscan/cli --prompt\n\n# Fail CI below a score floor\npnpm dlx @shadscan/cli --fail-under 80 --no-interactive"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "slug": "browseract",
+    "name": "BrowserAct",
+    "description": "BrowserAct is a browser automation CLI built for AI agents.",
+    "isNew": true,
+    "url": "https://www.browseract.com",
+    "images": [
+      "/images/browseract/photo1.png",
+      "/images/browseract/photo2.png"
+    ],
+    "tags": [
+      "ai-agents",
+      "browser-automation",
+      "web-scraping",
+      "cli",
+      "cursor",
+      "claude-code"
+    ],
+    "updatedAt": "2026-07-24",
+    "socials": {
+      "github": "https://github.com/browser-act/skills",
+      "twitter": "https://x.com/browseract",
+      "youtube": "https://www.youtube.com/@browseract"
+    },
+    "info": [
+      {
+        "type": "text",
+        "content": "Its partners include Google Cloud, Oracle and others."
+      },
+      {
+        "type": "text",
+        "content": "Let's now try to make a browser layer. First, let's register, and then go to the dashboard."
+      },
+      {
+        "type": "image",
+        "content": "https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/cnqqenwqih9u710oou6a.png"
+      },
+      {
+        "type": "text",
+        "content": "There will be a block like this, click on the install button and simply copy the text into AI on your computer. I will insert this prompt into Cursor."
+      },
+      {
+        "type": "image",
+        "content": "https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/dbtuq6aynpzz9dvjpilp.png"
+      },
+      {
+        "type": "text",
+        "content": "Since I'm in ask mode in the cursor, the agent simply output the file, installing dependencies from which I installed the cli."
+      },
+      {
+        "type": "image",
+        "content": "https://dev-to-uploads.s3.us-east-2.amazonaws.com/uploads/articles/b6l6wsunhop16hbr99r0.png"
+      },
+      {
+        "type": "text",
+        "content": "After this, we'll be prompted to install several dependencies."
+      },
+      {
+        "type": "code",
+        "content": "uv tool install browser-act-cli --python 3.12"
+      },
+      {
+        "type": "text",
+        "content": "You can check the version as follows:"
+      },
+      {
+        "type": "code",
+        "content": "browser-act --version"
+      },
+      {
+        "type": "text",
+        "content": "If you're in a mode where AI can edit files, everything will happen automatically. If you're doing it manually, after the cli appears in the terminal, you'll need to get the actual workflow content:"
+      },
+      {
+        "type": "code",
+        "content": "browser-act get-skills core --skill-version 2.0.2"
+      },
+      {
+        "type": "text",
+        "content": "The CLI serves skill content that always matches the installed version, so instructions never go stale. Do NOT truncate the output — none of which are available through --help."
+      },
+      {
+        "type": "text",
+        "content": "Browser-act can run basic Chrome and chrome-direct browser automation without an API key. But if you want to access other features, you can register, as we did earlier, and enter the following:"
+      },
+      {
+        "type": "code",
+        "content": "browser-act auth login\nbrowser-act auth poll"
+      },
+      {
+        "type": "text",
+        "content": "Or set a key directly:"
+      },
+      {
+        "type": "code",
+        "content": "browser-act auth set <your_api_key>"
       }
     ]
   }
