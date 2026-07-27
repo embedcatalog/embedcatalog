@@ -201,7 +201,20 @@ export default async function ProjectPage({
             }
 
             if (block.type === "code") {
-              return <CopyBlock key={index} code={block.content} />
+              return <CopyBlock key={index} code={block.content ?? ""} />
+            }
+
+            if (block.type === "list") {
+              return (
+                <ul
+                  key={index}
+                  className="flex list-disc flex-col gap-2 pl-5 leading-relaxed"
+                >
+                  {(block.items ?? []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )
             }
 
             return (
@@ -210,7 +223,7 @@ export default async function ProjectPage({
                 className="bg-muted w-full overflow-hidden rounded-xl border"
               >
                 <Image
-                  src={block.content}
+                  src={block.content ?? ""}
                   alt={project.name}
                   width={1200}
                   height={800}

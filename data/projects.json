@@ -306,5 +306,48 @@
         "content": "browser-act auth set <your_api_key>"
       }
     ]
+  },
+  {
+    "id": "6",
+    "slug": "bifrost",
+    "name": "Bifrost",
+    "description": "Fastest enterprise AI gateway (50x faster than LiteLLM) with adaptive load balancer, cluster mode, guardrails, 1000+ models support & <100 µs overhead at 5k RPS.",
+    "isNew": true,
+    "url": "https://www.getmaxim.ai/bifrost",
+    "images": ["/images/bifrost/photo1.png", "/images/bifrost/photo2.png"],
+    "tags": ["ai-gateway", "llm", "openai", "load-balancing", "mcp", "go"],
+    "updatedAt": "2026-07-28",
+    "socials": {
+      "github": "https://github.com/maximhq/bifrost"
+    },
+    "info": [
+      {
+        "type": "text",
+        "content": "To be honest, I can describe the project simply and quickly. If you want a powerful LLM Gateway for your project, and at the same time deploy it in a user-friendly interface without setting up a bunch of configs and other things, then this project is for you."
+      },
+      {
+        "type": "text",
+        "content": "To set up a project, just enter a command in the terminal and wait 5 seconds:"
+      },
+      {
+        "type": "code",
+        "content": "npx -y @maximhq/bifrost"
+      },
+      {
+        "type": "heading",
+        "content": "Key advantages"
+      },
+      {
+        "type": "list",
+        "items": [
+          "40x lower overhead than another gateways (12µs vs 440µs)",
+          "68% less memory usage",
+          "100% success rate at 5,000 RPS",
+          "Code Mode - Models generate orchestration code instead of step-by-step calls",
+          "Semantic caching - 40-60% cost reduction on similar queries",
+          "Built-in control - RBAC, rate limiting, cost tracking, audit logs"
+        ]
+      }
+    ]
   }
 ]

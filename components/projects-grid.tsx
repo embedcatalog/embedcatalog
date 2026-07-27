@@ -41,8 +41,9 @@ function GithubIcon(props: React.ComponentProps<"svg">) {
 }
 
 export type ProjectInfoBlock = {
-  type: "heading" | "text" | "code" | "image"
-  content: string
+  type: "heading" | "text" | "code" | "image" | "list"
+  content?: string
+  items?: string[]
 }
 
 export type ProjectSocials = {
