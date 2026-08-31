@@ -26,8 +26,8 @@ The platform currently has the following list of embeds:
 
 - Open source
 - Service
-- Developer tool
 - Web app
+- Developer tool
 - Package
 - Other technical
 
