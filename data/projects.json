@@ -349,5 +349,46 @@
         ]
       }
     ]
+  },
+  {
+    "id": "7",
+    "slug": "resume-matcher",
+    "name": "Resume Matcher",
+    "description": "Improve your resumes with Resume Matcher.",
+    "isNew": true,
+    "url": "https://resumematcher.fyi/docs/getting-started",
+    "images": ["/images/resume-matcher/photo1.png"],
+    "tags": ["ai", "resume", "ats", "python", "nextjs", "machine-learning"],
+    "updatedAt": "2026-09-11",
+    "socials": {
+      "twitter": "https://twitter.com/srbhrai",
+      "github": "https://github.com/srbhr/Resume-Matcher"
+    },
+    "info": [
+      {
+        "type": "text",
+        "content": "The AI harness to build tailored resumes for each job application with Claude, ChatGPT, DeepSeek, Kimi, GLM, Gemma, and other LLMs. Supports both local and remote LLMs."
+      },
+      {
+        "type": "heading",
+        "content": "How it works"
+      },
+      {
+        "type": "text",
+        "content": "Upload a master resume, paste in a job description, and the app generates tailored resume content and a matching cover letter, with optional interview prep."
+      },
+      {
+        "type": "heading",
+        "content": "Quick start"
+      },
+      {
+        "type": "code",
+        "content": "git clone https://github.com/srbhr/Resume-Matcher.git\ncd Resume-Matcher\n\n# Backend\ncd apps/backend\ncp .env.example .env\nuv sync\nuv run app\n\n# Frontend\ncd apps/frontend\nnpm install\nnpm run dev"
+      },
+      {
+        "type": "text",
+        "content": "Open http://localhost:3000 and configure your AI provider in Settings."
+      }
+    ]
   }
 ]
