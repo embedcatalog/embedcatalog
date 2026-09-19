@@ -14,4 +14,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Site is statically exported (no server runtime), so auth runs entirely
 // in the browser: the client itself parses the OAuth/magic-link redirect
 // URL and persists the session to localStorage.
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    flowType: "pkce",
+    detectSessionInUrl: true,
+  },
+})

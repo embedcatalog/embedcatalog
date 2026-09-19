@@ -15,6 +15,22 @@ type AuthContextValue = {
 
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined)
 
+function clearAuthCallbackUrl() {
+  if (typeof window === "undefined") return
+
+  const hasAuthFragment = /(^|&)access_token=|(^|&)code=/.test(
+    window.location.hash
+  )
+
+  if (hasAuthFragment) {
+    window.history.replaceState(
+      null,
+      document.title,
+      `${window.location.pathname}${window.location.search}`
+    )
+  }
+}
+
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
@@ -24,12 +40,14 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session)
       setLoading(false)
+      clearAuthCallbackUrl()
     })
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, newSession) => {
         setSession(newSession)
         setLoading(false)
+        clearAuthCallbackUrl()
       }
     )
 
