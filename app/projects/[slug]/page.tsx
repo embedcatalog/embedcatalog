@@ -12,11 +12,10 @@ import { CopyLinkButton } from "components/copy-link-button"
 import { ImageCarousel } from "components/image-carousel"
 import { ProjectEmbeds } from "components/project-embeds"
 import { ProjectGithubStats } from "components/project-github-stats"
-import { type Project } from "components/projects-grid"
-import projectsData from "data/projects.json"
+import { getPublishedProjects } from "lib/supabase/projects"
+import { supabase } from "lib/supabase/client"
 import { siteConfig } from "lib/site"
-
-const projects = projectsData as Project[]
+import { formatDate } from "lib/utils"
 
 function TwitterIcon(props: React.ComponentProps<"svg">) {
   return (
@@ -42,7 +41,8 @@ function GithubIcon(props: React.ComponentProps<"svg">) {
   )
 }
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const projects = await getPublishedProjects()
   return projects.map((project) => ({ slug: project.slug }))
 }
 
@@ -52,6 +52,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
+  const projects = await getPublishedProjects()
   const project = projects.find((item) => item.slug === slug)
 
   if (!project) {
@@ -85,11 +86,18 @@ export default async function ProjectPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const projects = await getPublishedProjects()
   const project = projects.find((item) => item.slug === slug)
 
   if (!project) {
     notFound()
   }
+
+  const { data: customEmbeds } = await supabase
+    .from("project_embeds")
+    .select("title, description, theme")
+    .eq("project_id", project.id)
+    .order("position", { ascending: true })
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -113,7 +121,7 @@ export default async function ProjectPage({
             <h1 className="text-2xl font-semibold">{project.name}</h1>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Updated {project.updatedAt}
+            Added {formatDate(project.createdAt)}
           </p>
         </div>
 
@@ -126,7 +134,7 @@ export default async function ProjectPage({
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`${project.name} on X`}
-                  className="text-muted-foreground hover:bg-accent hover:text-foreground flex size-9 items-center justify-center rounded-md border transition-colors"
+                  className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   <TwitterIcon className="size-4" />
                 </a>
@@ -137,7 +145,7 @@ export default async function ProjectPage({
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`${project.name} on YouTube`}
-                  className="text-muted-foreground hover:bg-accent hover:text-foreground flex size-9 items-center justify-center rounded-md border transition-colors"
+                  className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   <YoutubeIcon className="size-4" />
                 </a>
@@ -148,7 +156,7 @@ export default async function ProjectPage({
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`${project.name} on GitHub`}
-                  className="text-muted-foreground hover:bg-accent hover:text-foreground flex size-9 items-center justify-center rounded-md border transition-colors"
+                  className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                 >
                   <GithubIcon className="size-4" />
                 </a>
@@ -174,7 +182,13 @@ export default async function ProjectPage({
         <ImageCarousel images={project.images} alt={project.name} />
       </div>
 
-      <ProjectEmbeds slug={project.slug} projectName={project.name} />
+      <ProjectEmbeds
+        slug={project.slug}
+        projectName={project.name}
+        externalUrl={project.url}
+        isPremium={project.premium ?? false}
+        customEmbeds={customEmbeds ?? []}
+      />
 
       <p className="mt-6 leading-relaxed">{project.description}</p>
 
@@ -220,7 +234,7 @@ export default async function ProjectPage({
             return (
               <div
                 key={index}
-                className="bg-muted w-full overflow-hidden rounded-xl border"
+                className="w-full overflow-hidden rounded-xl border bg-muted"
               >
                 <Image
                   src={block.content ?? ""}

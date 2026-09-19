@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
-import { Check, Copy } from "lucide-react"
+import { Check, Copy, Lock } from "lucide-react"
 
 import {
   Card,
@@ -12,7 +12,12 @@ import {
   CardTitle,
 } from "components/ui/card"
 import { Embed } from "components/ui/embed"
-import { type EmbedKind, type EmbedTheme, getEmbedSize, getPublicEmbedSrc } from "lib/embed"
+import {
+  type EmbedKind,
+  type EmbedTheme,
+  getEmbedSize,
+  getPublicEmbedSrc,
+} from "lib/embed"
 import { siteConfig } from "lib/site"
 import { cn } from "lib/utils"
 
@@ -46,7 +51,7 @@ function ThemeSwitch({
       <span
         className={cn(
           "text-xs",
-          !isDark ? "text-foreground font-medium" : "text-muted-foreground"
+          !isDark ? "font-medium text-foreground" : "text-muted-foreground"
         )}
       >
         Light
@@ -59,12 +64,12 @@ function ThemeSwitch({
         onClick={() => onThemeChange(isDark ? "light" : "dark")}
         className={cn(
           "relative h-5 w-9 shrink-0 rounded-full border transition-colors",
-          isDark ? "bg-foreground border-foreground" : "bg-muted border-border"
+          isDark ? "border-foreground bg-foreground" : "border-border bg-muted"
         )}
       >
         <span
           className={cn(
-            "bg-background absolute top-0.5 left-0.5 size-4 rounded-full shadow-sm transition-transform",
+            "absolute top-0.5 left-0.5 size-4 rounded-full bg-background shadow-sm transition-transform",
             isDark && "translate-x-4"
           )}
         />
@@ -72,7 +77,7 @@ function ThemeSwitch({
       <span
         className={cn(
           "text-xs",
-          isDark ? "text-foreground font-medium" : "text-muted-foreground"
+          isDark ? "font-medium text-foreground" : "text-muted-foreground"
         )}
       >
         Dark
@@ -95,19 +100,104 @@ function EmbedHtmlLine({ code }: { code: string }) {
   }
 
   return (
-    <div className="bg-muted flex items-center gap-1.5 rounded-md border px-2 py-1.5">
-      <code className="text-muted-foreground min-w-0 flex-1 truncate text-[10px] leading-none">
+    <div className="flex items-center gap-1.5 rounded-md border bg-muted px-2 py-1.5">
+      <code className="min-w-0 flex-1 truncate text-[10px] leading-none text-muted-foreground">
         {code}
       </code>
       <button
         type="button"
         onClick={handleCopy}
         aria-label={copied ? "Copied" : "Copy HTML"}
-        className="text-muted-foreground hover:bg-background hover:text-foreground flex size-6 shrink-0 items-center justify-center rounded-md transition-colors"
+        className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
       >
         {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
       </button>
     </div>
+  )
+}
+
+function buildCustomEmbedHtml({
+  projectUrl,
+  title,
+  description,
+  theme,
+}: {
+  projectUrl: string
+  title: string
+  description: string
+  theme: EmbedTheme
+}) {
+  const colors =
+    theme === "dark"
+      ? {
+          background: "#171717",
+          border: "#404040",
+          text: "#fafafa",
+          muted: "#a3a3a3",
+        }
+      : {
+          background: "#ffffff",
+          border: "#d4d4d4",
+          text: "#171717",
+          muted: "#737373",
+        }
+  return `<a href="${projectUrl}" target="_blank" rel="noreferrer noopener" style="display:inline-block;color:${colors.text};text-decoration:none"><span style="display:block;max-width:320px;border:1px solid ${colors.border};border-radius:4px;background:${colors.background};padding:14px 16px;font-family:Arial,sans-serif"><strong style="display:block;font-size:14px;line-height:20px">${title}</strong><span style="display:block;margin-top:4px;color:${colors.muted};font-size:12px;line-height:18px">${description}</span></span></a>`
+}
+
+function CustomEmbedCard({
+  projectUrl,
+  title,
+  description,
+  theme,
+}: {
+  projectUrl: string
+  title: string
+  description: string
+  theme: EmbedTheme
+}) {
+  const html = buildCustomEmbedHtml({ projectUrl, title, description, theme })
+  const colors =
+    theme === "dark"
+      ? {
+          background: "#171717",
+          border: "#404040",
+          text: "#fafafa",
+          muted: "#a3a3a3",
+        }
+      : {
+          background: "#ffffff",
+          border: "#d4d4d4",
+          text: "#171717",
+          muted: "#737373",
+        }
+
+  return (
+    <Card className="gap-4 py-4 shadow-none">
+      <CardHeader className="border-b px-4 pb-4">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3 px-4">
+        <div
+          className="w-full max-w-xs rounded border p-4"
+          style={{
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.text,
+          }}
+        >
+          <p className="text-sm leading-5 font-semibold">{title}</p>
+          {description && (
+            <p
+              className="mt-1 text-xs leading-[18px]"
+              style={{ color: colors.muted }}
+            >
+              {description}
+            </p>
+          )}
+        </div>
+        <EmbedHtmlLine code={html} />
+      </CardContent>
+    </Card>
   )
 }
 
@@ -118,6 +208,7 @@ function EmbedCard({
   title,
   kind,
   premium = false,
+  isPremium = false,
 }: {
   slug: string
   projectName: string
@@ -125,7 +216,33 @@ function EmbedCard({
   title: string
   kind: EmbedKind
   premium?: boolean
+  isPremium?: boolean
 }) {
+  if (premium && !isPremium) {
+    return (
+      <Card className="gap-4 py-4 shadow-none">
+        <CardHeader className="border-b px-4 pb-4">
+          <CardTitle className="flex items-center gap-2 text-sm font-medium">
+            <Embed variant="secondary">
+              <Lock />
+              Premium
+            </Embed>
+            {title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 px-4">
+          <div className="flex min-h-16 items-center justify-center rounded border border-dashed bg-muted/40 text-sm text-muted-foreground">
+            <Lock className="mr-2 size-4" />
+            Available for Premium projects
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Upgrade this project to unlock the preview and embed code.
+          </p>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const [theme, setTheme] = React.useState<EmbedTheme>("light")
   const { width, height } = getEmbedSize(kind)
   const previewSrc = `/embed/${slug}/${kind}/${theme}/opengraph-image`
@@ -173,19 +290,42 @@ function EmbedCard({
   )
 }
 
+type CustomEmbed = {
+  title: string
+  description: string
+  theme: EmbedTheme
+}
+
+type EmbedTab = "default" | "premium" | "custom"
+
 function ProjectEmbeds({
   slug,
   projectName,
+  externalUrl,
+  isPremium,
+  customEmbeds,
 }: {
   slug: string
   projectName: string
+  externalUrl: string
+  isPremium: boolean
+  customEmbeds: CustomEmbed[]
 }) {
-  const projectUrl = `${siteConfig.url}/projects/${slug}`
+  const catalogUrl = `${siteConfig.url}/projects/${slug}`
+  const [tab, setTab] = React.useState<EmbedTab>("default")
 
-  const groups = [
+  const defaultGroups = [
     { title: "License", kind: "license" as const },
     { title: "Added to", kind: "added" as const },
+  ]
+  const premiumGroups = [
     { title: "Organization", kind: "organization" as const, premium: true },
+  ]
+
+  const tabs: { id: EmbedTab; label: string }[] = [
+    { id: "default", label: "Default embeds" },
+    { id: "premium", label: "Premium embeds" },
+    { id: "custom", label: "Custom embeds" },
   ]
 
   return (
@@ -197,19 +337,75 @@ function ProjectEmbeds({
         Add interesting embeds to your website or README.
       </p>
 
-      <div className="flex flex-col gap-4">
-        {groups.map((group) => (
-          <EmbedCard
-            key={group.kind}
-            slug={slug}
-            projectName={projectName}
-            projectUrl={projectUrl}
-            title={group.title}
-            kind={group.kind}
-            premium={group.premium}
-          />
+      <div className="mb-4 flex w-fit gap-1 rounded-md border p-1">
+        {tabs.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setTab(item.id)}
+            className={cn(
+              "rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+              tab === item.id
+                ? "bg-secondary text-secondary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {item.label}
+          </button>
         ))}
       </div>
+
+      {tab === "default" && (
+        <div className="flex flex-col gap-4">
+          {defaultGroups.map((group) => (
+            <EmbedCard
+              key={group.kind}
+              slug={slug}
+              projectName={projectName}
+              projectUrl={catalogUrl}
+              title={group.title}
+              kind={group.kind}
+            />
+          ))}
+        </div>
+      )}
+
+      {tab === "premium" && (
+        <div className="flex flex-col gap-4">
+          {premiumGroups.map((group) => (
+            <EmbedCard
+              key={group.kind}
+              slug={slug}
+              projectName={projectName}
+              projectUrl={catalogUrl}
+              title={group.title}
+              kind={group.kind}
+              premium={group.premium}
+              isPremium={isPremium}
+            />
+          ))}
+        </div>
+      )}
+
+      {tab === "custom" && (
+        <div className="flex flex-col gap-4">
+          {customEmbeds.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              This project hasn&rsquo;t added any custom embeds yet.
+            </p>
+          ) : (
+            customEmbeds.map((embed, index) => (
+              <CustomEmbedCard
+                key={index}
+                projectUrl={externalUrl}
+                title={embed.title}
+                description={embed.description}
+                theme={embed.theme}
+              />
+            ))
+          )}
+        </div>
+      )}
     </section>
   )
 }

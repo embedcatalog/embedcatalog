@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "components/ui/card"
 import { ProjectCardStars } from "components/project-card-stars"
+import { formatDate } from "lib/utils"
 
 function TwitterIcon(props: React.ComponentProps<"svg">) {
   return (
@@ -60,9 +61,10 @@ export type Project = {
   isNew: boolean
   premium?: boolean
   url: string
+  githubUrl?: string
   images: string[]
   tags: string[]
-  updatedAt: string
+  createdAt: string
   info?: ProjectInfoBlock[]
   socials?: ProjectSocials
 }
@@ -76,7 +78,7 @@ function ProjectsGrid({
 }) {
   if (projects.length === 0) {
     return (
-      <div className="text-muted-foreground rounded-xl border border-dashed p-10 text-center text-sm">
+      <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
         No projects found.
       </div>
     )
@@ -96,7 +98,7 @@ function ProjectsGrid({
           />
 
           {project.images[0] && (
-            <div className="bg-muted pointer-events-none relative -mt-6 aspect-video w-full overflow-hidden border-b select-none">
+            <div className="pointer-events-none relative -mt-6 aspect-video w-full overflow-hidden border-b bg-muted select-none">
               <Image
                 src={project.images[0]}
                 alt={project.name}
@@ -127,7 +129,7 @@ function ProjectsGrid({
                 target="_blank"
                 rel="noreferrer noopener"
                 aria-label={`Link to ${project.name}`}
-                className="text-muted-foreground hover:bg-accent hover:text-foreground flex h-8 items-center rounded-md border px-3 text-sm font-medium transition-colors"
+                className="flex h-8 items-center rounded-md border px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 link
               </a>
@@ -147,8 +149,8 @@ function ProjectsGrid({
               ))}
             </div>
           </CardContent>
-          <CardFooter className="text-muted-foreground mt-auto justify-between text-xs">
-            <span>Updated {project.updatedAt}</span>
+          <CardFooter className="mt-auto justify-between text-xs text-muted-foreground">
+            <span>Added {formatDate(project.createdAt)}</span>
             <div className="relative z-10 flex items-center gap-0.5">
               {project.socials?.github && (
                 <ProjectCardStars githubUrl={project.socials.github} />
@@ -159,7 +161,7 @@ function ProjectsGrid({
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`${project.name} on X`}
-                  className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
+                  className="flex size-7 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-foreground"
                 >
                   <TwitterIcon className="size-4" />
                 </a>
@@ -170,7 +172,7 @@ function ProjectsGrid({
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`${project.name} on YouTube`}
-                  className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
+                  className="flex size-7 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-foreground"
                 >
                   <YoutubeIcon className="size-4" />
                 </a>
@@ -181,7 +183,7 @@ function ProjectsGrid({
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={`${project.name} on GitHub`}
-                  className="hover:bg-accent hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors"
+                  className="flex size-7 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-foreground"
                 >
                   <GithubIcon className="size-4" />
                 </a>

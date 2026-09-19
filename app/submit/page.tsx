@@ -10,8 +10,8 @@ import {
   Share2,
 } from "lucide-react"
 
-import { CopyBlock } from "components/copy-block"
 import { Button } from "components/ui/button"
+import { SubmitProjectPanel } from "components/submit-project-panel"
 import { cn } from "lib/utils"
 import { siteConfig } from "lib/site"
 
@@ -278,39 +278,38 @@ export default function SubmitPage() {
           />
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          In July 2026, due to the volume of work, we&rsquo;ll be able to add
-          the first fifteen paid projects.
+          In September 2026, due to the volume of work, we&rsquo;ll be able to
+          add the first fifteen paid projects.
         </p>
       </div>
 
-      <div
-        id="get-started"
-        className="mt-8 scroll-mt-20 rounded-xl border p-5 text-left"
-      >
-        <p className="text-sm font-medium">In your message, please include</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Prepare an object with a title, tags, a short description, and a URL.
-          The project details page and images will be discussed with you
-          (usually prepared by the website owner). Optionally, you can add links
-          to social media: Twitter, YouTube, and GitHub.
+      <div id="get-started" className="mt-8 scroll-mt-20">
+        <SubmitProjectPanel />
+        <p className="mt-3 text-sm text-muted-foreground">
+          Want premium? Email us at{" "}
+          <a
+            href={`mailto:${EMAIL}`}
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            {EMAIL}
+          </a>{" "}
+          or DM us on{" "}
+          <a
+            href={TWITTER_URL}
+            target="_blank"
+            rel="noreferrer noopener"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            X (Twitter)
+          </a>
+          .
         </p>
-        <CopyBlock
-          className="mt-3"
-          code={`{
-  title: "My awesome project",
-  tags: ["design", "frontend"],
-  short_description: "A short summary of what it does.",
-  url: "https://example.com/my-awesome-project",
-  socials?: {
-    "twitter": "https://x.com/username",
-    "youtube": "https://youtube.com/@channel",
-    "github": "https://github.com/user/repo"
-  }
-}`}
-        />
       </div>
 
       <div id="contact" className="mt-10 flex scroll-mt-20 flex-col gap-3">
+        <p className="text-sm text-muted-foreground">
+          Prefer to reach out directly? Contact us by email or on X.
+        </p>
         <a
           href={`mailto:${EMAIL}`}
           className="flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-accent"

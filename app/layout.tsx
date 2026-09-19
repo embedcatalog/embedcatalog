@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "components/theme-provider"
+import { AuthProvider } from "components/auth-provider"
 import { Header } from "components/header"
 import { Footer } from "components/footer"
 import { GithubStars } from "components/github-stars"
@@ -81,11 +82,13 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <div className="flex min-h-svh flex-col">
-            <Header githubSlot={<GithubStars />} />
-            <div className="flex-1">{children}</div>
-            <Footer />
-          </div>
+          <AuthProvider>
+            <div className="flex min-h-svh flex-col">
+              <Header githubSlot={<GithubStars />} />
+              <div className="flex-1">{children}</div>
+              <Footer />
+            </div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

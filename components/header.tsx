@@ -6,6 +6,7 @@ import { Menu, Moon, Sun, X } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "components/ui/button"
+import { useAuth } from "components/auth-provider"
 import { cn } from "lib/utils"
 import { siteConfig } from "lib/site"
 
@@ -32,6 +33,7 @@ function ThemeToggle() {
 
 function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
+  const { user, loading } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -60,6 +62,13 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
           {githubSlot}
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
+            {!loading && (
+              <Button size="sm" variant="outline" asChild>
+                <Link href={user ? "/account" : "/login"}>
+                  {user ? "Account" : "Sign in"}
+                </Link>
+              </Button>
+            )}
             <Button size="sm" asChild>
               <Link href="/submit">Submit</Link>
             </Button>
@@ -80,12 +89,7 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
         </div>
       </div>
 
-      <div
-        className={cn(
-          "border-t md:hidden",
-          open ? "block" : "hidden"
-        )}
-      >
+      <div className={cn("border-t md:hidden", open ? "block" : "hidden")}>
         <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
           {navLinks.map((link) => (
             <Link
@@ -98,6 +102,16 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
             </Link>
           ))}
           <div className="mt-2 flex flex-col gap-2">
+            {!loading && (
+              <Button size="sm" variant="outline" asChild>
+                <Link
+                  href={user ? "/account" : "/login"}
+                  onClick={() => setOpen(false)}
+                >
+                  {user ? "Account" : "Sign in"}
+                </Link>
+              </Button>
+            )}
             <Button size="sm" asChild>
               <Link href="/submit" onClick={() => setOpen(false)}>
                 Submit

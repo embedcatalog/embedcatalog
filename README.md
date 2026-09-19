@@ -16,8 +16,8 @@ While developing open source projects, one day I came up with the idea of ​​
 
 The platform currently has the following list of embeds:
 
-| Embed        | Light                                                                                                          | Dark                                                                                                                    | Plan    |
-| ------------ | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------- |
+| Embed        | Light                                                                                                           | Dark                                                                                                                       | Plan    |
+| ------------ | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------- |
 | License      | [![license](https://embedcatalog.com/embed/hmpl/license.png)](https://embedcatalog.com/projects/hmpl)           | [![license](https://embedcatalog.com/embed/hmpl/license.theme-dark.png)](https://embedcatalog.com/projects/hmpl)           | Free    |
 | Added to     | [![added](https://embedcatalog.com/embed/hmpl/added.png)](https://embedcatalog.com/projects/hmpl)               | [![added](https://embedcatalog.com/embed/hmpl/added.theme-dark.png)](https://embedcatalog.com/projects/hmpl)               | Free    |
 | Organization | [![organization](https://embedcatalog.com/embed/hmpl/organization.png)](https://embedcatalog.com/projects/hmpl) | [![organization](https://embedcatalog.com/embed/hmpl/organization.theme-dark.png)](https://embedcatalog.com/projects/hmpl) | Premium |

@@ -1,0 +1,41 @@
+import { type Project } from "components/projects-grid"
+import { supabase } from "lib/supabase/client"
+
+const NEW_PROJECT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
+
+async function getPublishedProjects(): Promise<Project[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select(
+      "id, slug, name, description, url, github_url, images, tags, socials, info, is_premium, created_at"
+    )
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+
+  if (error || !data) {
+    if (error) {
+      console.error("Failed to load published projects:", error.message)
+    }
+    return []
+  }
+
+  return data.map((project) => ({
+    id: project.id,
+    slug: project.slug,
+    name: project.name,
+    description: project.description,
+    isNew:
+      Date.now() - new Date(project.created_at).getTime() <
+      NEW_PROJECT_WINDOW_MS,
+    premium: project.is_premium,
+    url: project.url,
+    githubUrl: project.github_url ?? project.socials?.github ?? undefined,
+    images: project.images ?? [],
+    tags: project.tags ?? [],
+    createdAt: project.created_at,
+    info: (project.info as Project["info"]) ?? undefined,
+    socials: project.socials ?? undefined,
+  }))
+}
+
+export { getPublishedProjects }

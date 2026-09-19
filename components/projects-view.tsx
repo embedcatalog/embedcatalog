@@ -48,7 +48,7 @@ function ProjectsView({
   const sorted = React.useMemo(() => {
     return [...filtered].sort((a, b) => {
       const diff =
-        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       return sort === "desc" ? -diff : diff
     })
   }, [filtered, sort])
@@ -65,8 +65,7 @@ function ProjectsView({
     setSelectedTags([])
   }
 
-  const hasActiveFilters =
-    query !== "" || newOnly || selectedTags.length > 0
+  const hasActiveFilters = query !== "" || newOnly || selectedTags.length > 0
 
   return (
     <div
@@ -75,90 +74,90 @@ function ProjectsView({
       }
     >
       {showFilters && (
-      <aside className="flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium">Filters</h2>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="text-muted-foreground hover:text-foreground text-xs"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
-        <div>
-          <h3 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-            Sort by date
-          </h3>
-          <div className="flex flex-col gap-2">
-            <label className="flex cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "desc"}
-                onChange={() => setSort("desc")}
-                className="accent-primary size-4"
-              />
-              <span>Desc</span>
-            </label>
-            <label className="flex cursor-pointer items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name="sort"
-                checked={sort === "asc"}
-                onChange={() => setSort("asc")}
-                className="accent-primary size-4"
-              />
-              <span>Asc</span>
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-            Status
-          </h3>
-          <label className="flex cursor-pointer items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={newOnly}
-              onChange={() => setNewOnly((prev) => !prev)}
-              className="border-input accent-primary size-4 rounded border"
-            />
-            <span>New only</span>
-          </label>
-        </div>
-
-        <div>
-          <h3 className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-            Tags
-          </h3>
-          <div className="flex max-h-48 flex-col gap-2 overflow-y-auto pr-1">
-            {allTags.map((tag) => (
-              <label
-                key={tag}
-                className="flex cursor-pointer items-center gap-2 text-sm"
+        <aside className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium">Filters</h2>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-xs text-muted-foreground hover:text-foreground"
               >
-                <input
-                  type="checkbox"
-                  checked={selectedTags.includes(tag)}
-                  onChange={() => toggleTag(tag)}
-                  className="border-input accent-primary size-4 rounded border"
-                />
-                <span>{tag}</span>
-              </label>
-            ))}
+                Clear
+              </button>
+            )}
           </div>
-        </div>
-      </aside>
+
+          <div>
+            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Sort by date
+            </h3>
+            <div className="flex flex-col gap-2">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="sort"
+                  checked={sort === "desc"}
+                  onChange={() => setSort("desc")}
+                  className="size-4 accent-primary"
+                />
+                <span>Desc</span>
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="sort"
+                  checked={sort === "asc"}
+                  onChange={() => setSort("asc")}
+                  className="size-4 accent-primary"
+                />
+                <span>Asc</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Status
+            </h3>
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={newOnly}
+                onChange={() => setNewOnly((prev) => !prev)}
+                className="size-4 rounded border border-input accent-primary"
+              />
+              <span>New only</span>
+            </label>
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Tags
+            </h3>
+            <div className="flex max-h-48 flex-col gap-2 overflow-y-auto pr-1">
+              {allTags.map((tag) => (
+                <label
+                  key={tag}
+                  className="flex cursor-pointer items-center gap-2 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedTags.includes(tag)}
+                    onChange={() => toggleTag(tag)}
+                    className="size-4 rounded border border-input accent-primary"
+                  />
+                  <span>{tag}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </aside>
       )}
 
       <div className="flex flex-col gap-4">
         <div className="relative max-w-sm">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -170,7 +169,7 @@ function ProjectsView({
               type="button"
               aria-label="Clear search"
               onClick={() => setQuery("")}
-              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="size-4" />
             </button>

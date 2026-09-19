@@ -1,7 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 
-import { type Project } from "components/projects-grid"
-import projectsData from "data/projects.json"
+import { getPublishedProjects } from "lib/supabase/projects"
 import {
   embedKinds,
   embedThemes,
@@ -9,11 +8,10 @@ import {
   type EmbedTheme,
 } from "lib/embed"
 
-const projects = projectsData as Project[]
-
 export const dynamic = "force-static"
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const projects = await getPublishedProjects()
   return projects.flatMap((project) =>
     embedKinds.flatMap((kind) =>
       embedThemes.map((theme) => ({
@@ -31,6 +29,7 @@ export default async function EmbedPage({
   params: Promise<{ slug: string; kind: string; theme: string }>
 }) {
   const { slug, kind, theme } = await params
+  const projects = await getPublishedProjects()
   const project = projects.find((item) => item.slug === slug)
 
   if (

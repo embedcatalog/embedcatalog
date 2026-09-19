@@ -20,61 +20,71 @@ export const metadata: Metadata = {
 
 const sections = [
   {
-    title: "1. Purpose of the Website",
+    title: "1. About the service",
     paragraphs: [
-      "This website is an online public catalog of projects. The website displays publicly available information, including project names, descriptions, images, and links to third-party websites.",
+      "EmbedCatalog is an online catalog for discovering projects and creating or displaying embeds. Some features require an account; some submission and promotional services may be paid.",
     ],
   },
   {
-    title: "2. Public Content",
+    title: "2. Accounts",
     paragraphs: [
-      "All content available on this website is intended for public viewing. The website does not guarantee the accuracy, completeness, or timeliness of any information displayed.",
+      "You must provide accurate information, keep your credentials secure, and promptly tell us if you believe your account has been compromised. You are responsible for activity carried out through your account.",
+      "You must be legally capable of entering these Terms. If you use the service for an organization, you confirm that you have authority to bind it.",
     ],
   },
   {
-    title: "3. Third-Party Links",
+    title: "3. User content and public listings",
     paragraphs: [
-      "The website may contain links to third-party websites and services.",
-      "The website owner does not own, control, monitor, or endorse third-party websites and is not responsible for their availability, content, privacy practices, security, products, services, or any damages or losses resulting from their use.",
-      "Users access third-party websites entirely at their own risk.",
+      "You retain ownership of content you submit. You grant the operator a worldwide, non-exclusive, royalty-free license to host, reproduce, adapt for formatting, publish, display, distribute, and promote that content in connection with EmbedCatalog and its related channels.",
+      "You confirm that you own or have permission to submit the content, that it is accurate enough for publication, and that its publication does not violate law, privacy, confidentiality, intellectual-property, publicity, or other rights.",
+      "Published listings are public. Do not submit confidential information or personal data that should not be publicly displayed.",
     ],
   },
   {
-    title: "4. Disclaimer",
+    title: "4. Acceptable use and moderation",
     paragraphs: [
-      'The website is provided on an "AS IS" and "AS AVAILABLE" basis without any guarantees regarding its availability, accuracy, reliability, or fitness for any particular purpose.',
-      "The website owner does not guarantee uninterrupted availability, error-free operation, or that the website will always be free of bugs, viruses, or other harmful components.",
+      "You may not use the service for unlawful, fraudulent, abusive, infringing, harmful, misleading, or automated activity that burdens or compromises the service. We may review, reject, restrict, edit for formatting, unpublish, or remove content or accounts that breach these Terms or create risk.",
+      "We do not promise to monitor every listing or endorse any listed project.",
     ],
   },
   {
-    title: "5. Limitation of Liability",
+    title: "5. Paid services",
     paragraphs: [
-      "To the maximum extent permitted by applicable law, the website owner shall not be liable for any direct, indirect, incidental, consequential, special, or punitive damages arising from or related to the use of this website or any third-party website linked from it.",
+      "Prices, scope, and payment conditions for paid submissions are described in the Project Submission Terms and agreed with the operator by email or another available contact channel. The website does not provide an on-site checkout or integrated payment gateway. After the details are agreed, you may send the payment directly to the operator through PayPal using the payment instructions provided by the operator. PayPal processes that transaction under its own terms and privacy policy. Taxes, PayPal fees, bank fees, and currency-conversion charges may apply unless stated otherwise.",
+      "Paid services are not a guarantee of traffic, sales, rankings, approval, publication, or a particular promotional result. Refund rules are described in the Project Submission Terms and do not limit rights that cannot legally be waived.",
     ],
   },
   {
     title: "6. Intellectual Property",
     paragraphs: [
-      "All trademarks, logos, project names, and other intellectual property displayed on this website remain the property of their respective owners.",
-      "Their appearance on this website does not imply any affiliation, sponsorship, endorsement, or ownership unless explicitly stated.",
+      "EmbedCatalog, its original software, design, text, and branding belong to the operator or its licensors. Project names, logos, trademarks, and submitted materials remain with their respective owners. Their display does not imply affiliation or endorsement.",
+      "You may not copy, scrape, frame, reverse engineer, or commercially exploit the service except as allowed by law or by written permission. Open-source code, if any, is governed by its applicable license.",
     ],
   },
   {
-    title: "7. Content Removal",
+    title: "7. Third-party services",
     paragraphs: [
-      "If you are the owner of any content displayed on this website and believe that it should be removed or corrected, you may contact the website owner. Valid requests will be reviewed within a reasonable time.",
+      "The service links to or relies on third parties, including Supabase, analytics providers, PayPal, hosting providers, project websites, and social networks. We do not control their availability, content, security, or privacy practices. Use them at your own risk and review their terms. PayPal is used for direct payments arranged outside the website; the website does not operate or control PayPal's payment infrastructure.",
     ],
   },
   {
-    title: "8. Changes",
+    title: "8. Disclaimers and liability",
     paragraphs: [
-      "The website owner may update or modify these Terms of Service at any time without prior notice. Continued use of the website after changes are published constitutes acceptance of the updated Terms.",
+      'To the maximum extent permitted by law, the service is provided "AS IS" and "AS AVAILABLE" without warranties of availability, accuracy, fitness, or uninterrupted or error-free operation. We are not liable for indirect, incidental, special, consequential, or loss-of-profit damages arising from the service or third-party services.',
+      "Nothing in these Terms excludes or limits liability that cannot be excluded under applicable law, including mandatory consumer rights, liability for fraud, or liability for death or personal injury caused by negligence.",
     ],
   },
   {
-    title: "9. Contact",
+    title: "9. Suspension and termination",
     paragraphs: [
-      "For questions regarding these Terms of Service, please contact the website owner using the contact information provided on the website.",
+      "You may stop using the service at any time. We may suspend or terminate access, or discontinue features, when reasonably necessary for security, legal compliance, abuse prevention, non-payment, or a breach of these Terms. Terms that should survive termination will continue to apply.",
+    ],
+  },
+  {
+    title: "10. Governing law and contact",
+    paragraphs: [
+      "These Terms are governed by the laws of the Republic of Kazakhstan, without preventing you from relying on mandatory consumer protections in the country where you live. Courts of Kazakhstan will have jurisdiction to the extent permitted by law.",
+      "For questions, notices, or content complaints, contact the operator at the email address below.",
     ],
   },
 ]
@@ -84,7 +94,7 @@ export default function TermsPage() {
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-semibold">Terms of Service</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Last updated: July 5, 2026
+        Last updated: September 19, 2026
       </p>
 
       <p className="mt-6 leading-relaxed text-muted-foreground">
@@ -101,7 +111,7 @@ export default function TermsPage() {
               {section.paragraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
-              {section.title === "9. Contact" && (
+              {section.title === "10. Governing law and contact" && (
                 <p>
                   Email:{" "}
                   <a

@@ -99,7 +99,9 @@ async function getEmbedLines(
     return [`Added to: ${siteConfig.name}`]
   }
 
-  const meta = await fetchGithubRepoMeta(project.socials?.github)
+  const meta = await fetchGithubRepoMeta(
+    project.githubUrl ?? project.socials?.github
+  )
 
   if (kind === "organization") {
     return [

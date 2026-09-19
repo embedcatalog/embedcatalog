@@ -24,9 +24,7 @@ export const metadata: Metadata = {
   },
 }
 
-type Block =
-  | { type: "p"; text: string }
-  | { type: "ul"; items: string[] }
+type Block = { type: "p"; text: string } | { type: "ul"; items: string[] }
 
 type Section = { title: string; blocks: Block[] }
 
@@ -47,17 +45,20 @@ const sections: Section[] = [
       },
       {
         type: "p",
-        text: "The paid fee covers the time spent reviewing, preparing, publishing, and promoting your project beyond basic catalog listing.",
+        text: "The paid fee covers the time spent reviewing, preparing, publishing, and promoting your project beyond basic catalog listing. Premium is a one-time service fee, not a guarantee of a particular audience or result.",
       },
     ],
   },
   {
     title: "2. Refund Policy",
     blocks: [
-      { type: "p", text: "All payments for the Premium plan are final." },
       {
         type: "p",
-        text: "Because the submission fee covers the time spent reviewing, preparing, publishing, and promoting your project, no refunds will be issued after payment has been received, regardless of the number of views, clicks, visitors, sales, or any other results your project may receive.",
+        text: "All payments for the Premium plan are final once work on the paid service has started, except where a refund is required by applicable law or expressly agreed in writing.",
+      },
+      {
+        type: "p",
+        text: "Once work has started, no refund is offered because the fee covers time and services already reserved or performed. We do not refund based on views, clicks, visitors, sales, rankings, or other results. If we cannot reasonably provide the paid service and have not substantially performed it, contact us promptly so we can review an appropriate remedy.",
       },
       {
         type: "p",
@@ -79,11 +80,11 @@ const sections: Section[] = [
       },
       {
         type: "p",
-        text: "Screenshots, formatting, and the final presentation of the project listing are prepared by the website owner in consultation with the client.",
+        text: "Screenshots, formatting, and the final presentation of the project listing are prepared by the website owner in consultation with the client. You are responsible for ensuring that supplied materials may be used publicly.",
       },
       {
         type: "p",
-        text: "The website owner may correct grammar, formatting, or layout without changing the overall meaning of the submitted information.",
+        text: "The website owner may correct grammar, formatting, or layout without changing the overall meaning of the submitted information. We may reject or remove a submission that is unlawful, misleading, infringing, unsafe, or unsuitable for the catalog.",
       },
     ],
   },
@@ -136,11 +137,24 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "7. Contact",
+    title: "7. Publication license and privacy",
     blocks: [
       {
         type: "p",
-        text: "If you have any questions regarding your project submission, please contact the website owner using the contact information provided on the website.",
+        text: "By submitting a project, you grant EmbedCatalog a worldwide, non-exclusive, royalty-free license to host, reproduce, adapt for formatting, publish, display, distribute, and promote the submitted materials in connection with the catalog, embeds, articles, social posts, and related channels. You retain ownership of your project and materials.",
+      },
+      {
+        type: "p",
+        text: "Project listings are public. We process account and submission information as described in the Privacy Notice. Do not submit confidential information or personal data that should not be published.",
+      },
+    ],
+  },
+  {
+    title: "8. Contact and changes",
+    blocks: [
+      {
+        type: "p",
+        text: "If you have any questions regarding your project submission, payment, or a removal request, please contact the website owner using the email below. These terms may be updated when the submission process or applicable requirements change.",
       },
     ],
   },
@@ -150,11 +164,11 @@ export default function SubmissionTermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <h1 className="text-2xl font-semibold">Project Submission Terms</h1>
-      <p className="text-muted-foreground mt-2 text-sm">
-        Last updated: July 23, 2026
+      <p className="mt-2 text-sm text-muted-foreground">
+        Last updated: September 19, 2026
       </p>
 
-      <p className="text-muted-foreground mt-6 leading-relaxed">
+      <p className="mt-6 leading-relaxed text-muted-foreground">
         By submitting a project, you agree to the following terms. Projects can
         be added for free or under the paid Premium plan.
       </p>
@@ -163,10 +177,13 @@ export default function SubmissionTermsPage() {
         {sections.map((section) => (
           <section key={section.title}>
             <h2 className="text-lg font-semibold">{section.title}</h2>
-            <div className="text-muted-foreground mt-2 flex flex-col gap-3 leading-relaxed">
+            <div className="mt-2 flex flex-col gap-3 leading-relaxed text-muted-foreground">
               {section.blocks.map((block, index) =>
                 block.type === "ul" ? (
-                  <ul key={index} className="flex list-disc flex-col gap-1 pl-5">
+                  <ul
+                    key={index}
+                    className="flex list-disc flex-col gap-1 pl-5"
+                  >
                     {block.items.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
@@ -175,12 +192,12 @@ export default function SubmissionTermsPage() {
                   <p key={index}>{block.text}</p>
                 )
               )}
-              {section.title === "7. Contact" && (
+              {section.title === "8. Contact and changes" && (
                 <p>
                   Email:{" "}
                   <a
                     href={`mailto:${EMAIL}`}
-                    className="text-foreground font-medium underline underline-offset-4"
+                    className="font-medium text-foreground underline underline-offset-4"
                   >
                     {EMAIL}
                   </a>

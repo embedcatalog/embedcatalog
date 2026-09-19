@@ -1,11 +1,8 @@
 import type { Metadata } from "next"
 
 import { ProjectsView } from "components/projects-view"
-import { type Project } from "components/projects-grid"
-import projectsData from "data/projects.json"
+import { getPublishedProjects } from "lib/supabase/projects"
 import { siteConfig } from "lib/site"
-
-const projects = projectsData as Project[]
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -42,7 +39,9 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Page() {
+export default async function Page() {
+  const projects = await getPublishedProjects()
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <div className="mb-6">
