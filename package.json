@@ -9,6 +9,7 @@
   "scripts": {
     "start": "next dev",
     "build": "next build && jiti scripts/copy-embed-pngs.ts",
+    "prod": "npm run build",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"

@@ -4,13 +4,14 @@ import * as React from "react"
 import { Check, Copy } from "lucide-react"
 
 import { Button } from "components/ui/button"
+import { siteConfig } from "lib/site"
 
 function CopyLinkButton({ path }: { path: string }) {
   const [copied, setCopied] = React.useState(false)
 
   async function handleCopy() {
     try {
-      const url = `${window.location.origin}${path}`
+      const url = `${siteConfig.url}${path}`
       await navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)

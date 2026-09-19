@@ -55,6 +55,16 @@ The platform is open to your ideas and code!
 
 Thanks to everyone who helps make it better!
 
+## Development and deployment
+
+Use `npm run start` for local development. Use `npm run prod` to build the production static export in `out/`.
+
+Set these GitHub Actions repository secrets at **Settings** -> **Secrets and variables** -> **Actions**:
+
+- `NEXT_PUBLIC_SITE_URL` — `https://embedcatalog.com`
+- `NEXT_PUBLIC_SUPABASE_URL` — the Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the Supabase publishable/anon key
+
 ## License
 
 Source code released under the AGPL-3.0 license.

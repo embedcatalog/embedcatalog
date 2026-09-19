@@ -17,6 +17,7 @@ import {
 } from "components/ui/card"
 import { useAuth } from "components/auth-provider"
 import { supabase } from "lib/supabase/client"
+import { siteConfig } from "lib/site"
 
 function GithubIcon(props: React.ComponentProps<"svg">) {
   return (
@@ -49,10 +50,7 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/account`
-            : undefined,
+        emailRedirectTo: `${siteConfig.url}/account`,
       },
     })
 
@@ -70,10 +68,7 @@ function LoginPage() {
     await supabase.auth.signInWithOAuth({
       provider: "github",
       options: {
-        redirectTo:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/account`
-            : undefined,
+        redirectTo: `${siteConfig.url}/account`,
       },
     })
   }
