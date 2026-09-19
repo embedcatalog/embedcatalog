@@ -227,7 +227,7 @@ function CreateProjectPage() {
                   id="project-title"
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  placeholder="My awesome project"
+                  placeholder="My project"
                   maxLength={80}
                 />
               </div>
@@ -262,7 +262,7 @@ function CreateProjectPage() {
                   type="url"
                   value={projectUrl}
                   onChange={(event) => setProjectUrl(event.target.value)}
-                  placeholder="https://example.com/my-awesome-project"
+                  placeholder="https://example.com/my-project"
                 />
               </div>
             </CardContent>
