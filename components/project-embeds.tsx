@@ -290,7 +290,7 @@ function EmbedCard({
   )
 }
 
-type CustomEmbed = {
+export type CustomEmbed = {
   title: string
   description: string
   theme: EmbedTheme

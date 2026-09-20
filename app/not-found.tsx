@@ -1,16 +1,23 @@
+"use client"
+
+import * as React from "react"
 import Link from "next/link"
 
 import { Button } from "components/ui/button"
+import { ProjectDetail } from "components/project-detail"
+import { type Project } from "components/projects-grid"
+import { supabase } from "lib/supabase/client"
+import { type CustomEmbed } from "components/project-embeds"
 
-export default function NotFound() {
+function NotFoundMessage() {
   return (
     <main className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center sm:px-6">
-      <p className="text-primary text-sm font-semibold">404</p>
+      <p className="text-sm font-semibold text-primary">404</p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight">
         Page not found
       </h1>
-      <p className="text-muted-foreground mt-3">
-        The page you are looking for doesn&apos;t exist or has been moved.
+      <p className="mt-3 text-muted-foreground">
+        The page you are looking for doesn&rsquo;t exist or has been moved.
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Button asChild>
@@ -23,3 +30,92 @@ export default function NotFound() {
     </main>
   )
 }
+
+function NotFound() {
+  const [project, setProject] = React.useState<Project | null>(null)
+  const [customEmbeds, setCustomEmbeds] = React.useState<CustomEmbed[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [isProjectPath, setIsProjectPath] = React.useState(false)
+
+  React.useEffect(() => {
+    const path = window.location.pathname
+    const match = path.match(/^\/projects\/([^/]+)\/?$/)
+
+    if (!match) {
+      setIsProjectPath(false)
+      setLoading(false)
+      return
+    }
+
+    setIsProjectPath(true)
+    const slug = decodeURIComponent(match[1])
+    let cancelled = false
+
+    async function loadProject() {
+      const { data, error } = await supabase
+        .from("projects")
+        .select(
+          "id, slug, name, description, url, github_url, images, tags, socials, info, is_premium, created_at"
+        )
+        .eq("slug", slug)
+        .eq("status", "published")
+        .maybeSingle()
+
+      if (cancelled) return
+      if (error || !data) {
+        setLoading(false)
+        return
+      }
+
+      const project: Project = {
+        id: data.id,
+        slug: data.slug,
+        name: data.name,
+        description: data.description,
+        isNew:
+          Date.now() - new Date(data.created_at).getTime() <
+          14 * 24 * 60 * 60 * 1000,
+        premium: data.is_premium,
+        url: data.url,
+        githubUrl: data.github_url ?? data.socials?.github,
+        images: data.images ?? [],
+        tags: data.tags ?? [],
+        createdAt: data.created_at,
+        info: (data.info as Project["info"]) ?? undefined,
+        socials: data.socials ?? undefined,
+      }
+
+      const { data: embeds } = await supabase
+        .from("project_embeds")
+        .select("title, description, theme")
+        .eq("project_id", project.id)
+        .order("position", { ascending: true })
+
+      if (cancelled) return
+      setProject(project)
+      setCustomEmbeds(embeds ?? [])
+      setLoading(false)
+    }
+
+    void loadProject()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  if (isProjectPath && loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted-foreground">
+        Loading project...
+      </div>
+    )
+  }
+
+  if (isProjectPath && project) {
+    return <ProjectDetail project={project} customEmbeds={customEmbeds} />
+  }
+
+  return <NotFoundMessage />
+}
+
+export default NotFound
