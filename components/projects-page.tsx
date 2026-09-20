@@ -5,6 +5,7 @@ import * as React from "react"
 import { ProjectsView } from "components/projects-view"
 import { supabase } from "lib/supabase/client"
 import { type Project } from "components/projects-grid"
+import { getProjectImageUrl } from "lib/storage"
 
 const NEW_PROJECT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
 
@@ -98,7 +99,7 @@ function mapProject(project: {
     premium: project.is_premium,
     url: project.url,
     githubUrl: project.github_url ?? project.socials?.github,
-    images: project.images ?? [],
+    images: (project.images ?? []).map(getProjectImageUrl),
     tags: project.tags ?? [],
     createdAt: project.created_at,
     info: (project.info as Project["info"]) ?? undefined,

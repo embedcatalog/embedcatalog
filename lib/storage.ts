@@ -10,4 +10,10 @@ function getStoragePublicUrl(path: string) {
   return `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`
 }
 
-export { bucket, getStoragePublicUrl }
+function getProjectImageUrl(image: string) {
+  if (/^https?:\/\//.test(image)) return image
+  const path = image.replace(/^\/images\//, "")
+  return getStoragePublicUrl(path)
+}
+
+export { bucket, getProjectImageUrl, getStoragePublicUrl }

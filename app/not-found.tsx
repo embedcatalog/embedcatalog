@@ -8,6 +8,7 @@ import { ProjectDetail } from "components/project-detail"
 import { type Project } from "components/projects-grid"
 import { supabase } from "lib/supabase/client"
 import { type CustomEmbed } from "components/project-embeds"
+import { getProjectImageUrl } from "lib/storage"
 
 function NotFoundMessage() {
   return (
@@ -78,7 +79,7 @@ function NotFound() {
         premium: data.is_premium,
         url: data.url,
         githubUrl: data.github_url ?? data.socials?.github,
-        images: data.images ?? [],
+        images: (data.images ?? []).map(getProjectImageUrl),
         tags: data.tags ?? [],
         createdAt: data.created_at,
         info: (data.info as Project["info"]) ?? undefined,

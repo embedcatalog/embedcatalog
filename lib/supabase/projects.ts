@@ -1,5 +1,6 @@
 import { type Project } from "components/projects-grid"
 import { supabase } from "lib/supabase/client"
+import { getProjectImageUrl } from "lib/storage"
 
 const NEW_PROJECT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
 
@@ -30,7 +31,7 @@ async function getPublishedProjects(): Promise<Project[]> {
     premium: project.is_premium,
     url: project.url,
     githubUrl: project.github_url ?? project.socials?.github ?? undefined,
-    images: project.images ?? [],
+    images: (project.images ?? []).map(getProjectImageUrl),
     tags: project.tags ?? [],
     createdAt: project.created_at,
     info: (project.info as Project["info"]) ?? undefined,
