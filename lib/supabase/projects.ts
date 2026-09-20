@@ -1,4 +1,5 @@
 import { type Project } from "components/projects-grid"
+
 import { supabase } from "lib/supabase/client"
 import { getProjectImageUrl } from "lib/storage"
 
