@@ -8,6 +8,71 @@ import { type Project } from "components/projects-grid"
 
 const NEW_PROJECT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000
 
+function SkeletonBlock({ className }: { className: string }) {
+  return <div className={`animate-pulse rounded-md bg-muted ${className}`} />
+}
+
+function ProjectsSkeleton() {
+  return (
+    <div className="grid gap-6 md:grid-cols-[220px_1fr]" aria-busy="true">
+      <aside className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <SkeletonBlock className="h-4 w-16" />
+          <SkeletonBlock className="h-3 w-10" />
+        </div>
+        <div>
+          <SkeletonBlock className="mb-3 h-3 w-20" />
+          <div className="flex flex-col gap-3">
+            <SkeletonBlock className="h-4 w-14" />
+            <SkeletonBlock className="h-4 w-14" />
+          </div>
+        </div>
+        <div>
+          <SkeletonBlock className="mb-3 h-3 w-12" />
+          <SkeletonBlock className="h-4 w-24" />
+        </div>
+        <div>
+          <SkeletonBlock className="mb-3 h-3 w-10" />
+          <div className="flex flex-col gap-3">
+            <SkeletonBlock className="h-4 w-20" />
+            <SkeletonBlock className="h-4 w-28" />
+            <SkeletonBlock className="h-4 w-24" />
+            <SkeletonBlock className="h-4 w-16" />
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex flex-col gap-4">
+        <SkeletonBlock className="h-10 w-full max-w-sm" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="flex min-h-64 flex-col gap-6 rounded-xl border py-6"
+            >
+              <div className="flex flex-col gap-3 px-6">
+                <SkeletonBlock className="h-5 w-2/3" />
+                <SkeletonBlock className="h-4 w-full" />
+                <SkeletonBlock className="h-4 w-5/6" />
+              </div>
+              <div className="flex flex-1 flex-col justify-end gap-5 px-6">
+                <div className="flex gap-2">
+                  <SkeletonBlock className="h-5 w-14" />
+                  <SkeletonBlock className="h-5 w-20" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <SkeletonBlock className="h-3 w-24" />
+                  <SkeletonBlock className="h-7 w-20" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function mapProject(project: {
   id: string
   slug: string
@@ -78,13 +143,7 @@ function ProjectsPage() {
           )}
         </h1>
       </div>
-      {loading ? (
-        <div className="rounded-xl border border-dashed p-10 text-center text-sm text-muted-foreground">
-          Loading projects...
-        </div>
-      ) : (
-        <ProjectsView projects={projects} />
-      )}
+      {loading ? <ProjectsSkeleton /> : <ProjectsView projects={projects} />}
     </>
   )
 }
