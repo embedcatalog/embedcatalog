@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import {
@@ -12,6 +13,7 @@ import {
   Plus,
   Sun,
   Trash2,
+  X,
 } from "lucide-react"
 
 import { useAuth } from "components/auth-provider"
@@ -60,7 +62,9 @@ function EditProjectForm() {
   const [projectUrl, setProjectUrl] = React.useState("")
   const [shortDescription, setShortDescription] = React.useState("")
   const [tagsInput, setTagsInput] = React.useState("")
-  const [imagesInput, setImagesInput] = React.useState("")
+  const [images, setImages] = React.useState<string[]>([])
+  const [imageFiles, setImageFiles] = React.useState<File[]>([])
+  const [infoInput, setInfoInput] = React.useState("")
   const [twitterUrl, setTwitterUrl] = React.useState("")
   const [youtubeUrl, setYoutubeUrl] = React.useState("")
   const [githubUrl, setGithubUrl] = React.useState("")
@@ -93,7 +97,7 @@ function EditProjectForm() {
       let query = supabase
         .from("projects")
         .select(
-          "id, owner_id, name, description, url, github_url, tags, socials, images, status"
+          "id, owner_id, name, description, url, github_url, tags, socials, images, info, status"
         )
         .eq("id", projectId as string)
 
@@ -116,7 +120,8 @@ function EditProjectForm() {
       setShortDescription(project.description)
       setProjectUrl(project.url)
       setTagsInput((project.tags ?? []).join(", "))
-      setImagesInput((project.images ?? []).join("\n"))
+      setImages(project.images ?? [])
+      setInfoInput(JSON.stringify(project.info ?? [], null, 2))
       const socials = project.socials ?? {}
       setTwitterUrl(socials.twitter ?? "")
       setYoutubeUrl(socials.youtube ?? "")
@@ -243,10 +248,14 @@ function EditProjectForm() {
     if (twitterUrl.trim()) socials.twitter = twitterUrl.trim()
     if (youtubeUrl.trim()) socials.youtube = youtubeUrl.trim()
     if (githubUrl.trim()) socials.github = githubUrl.trim()
-    const images = imagesInput
-      .split("\n")
-      .map((image) => image.trim())
-      .filter(Boolean)
+    let info: unknown
+
+    try {
+      info = JSON.parse(infoInput || "[]")
+    } catch {
+      setSaveError("Info must contain valid JSON.")
+      return
+    }
 
     if (!name || !description || !url) {
       setSaveError("Enter a title, short description, and valid URL.")
@@ -263,6 +272,27 @@ function EditProjectForm() {
     setSaving(true)
     setSaveError(null)
 
+    const uploadedImages: string[] = []
+
+    for (const file of imageFiles) {
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-")
+      const path = `${projectId}/${crypto.randomUUID()}-${safeName}`
+      const { error: uploadError } = await supabase.storage
+        .from("project-images")
+        .upload(path, file, { upsert: false })
+
+      if (uploadError) {
+        setSaving(false)
+        setSaveError(`Image upload failed: ${uploadError.message}`)
+        return
+      }
+
+      const { data } = supabase.storage
+        .from("project-images")
+        .getPublicUrl(path)
+      uploadedImages.push(data.publicUrl)
+    }
+
     const { error: projectError } = await supabase
       .from("projects")
       .update({
@@ -272,7 +302,10 @@ function EditProjectForm() {
         github_url: socials.github ?? null,
         tags: tags.length ? tags : null,
         socials: Object.keys(socials).length ? socials : null,
-        images: images.length ? images : null,
+        images: [...images, ...uploadedImages].length
+          ? [...images, ...uploadedImages]
+          : null,
+        info,
       })
       .eq("id", projectId as string)
 
@@ -398,20 +431,76 @@ function EditProjectForm() {
               <CardHeader>
                 <CardTitle className="text-lg">Images</CardTitle>
                 <CardDescription>
-                  One image URL per line. Used on the project&rsquo;s catalog
-                  page.
+                  Upload images for the project gallery. Changes are applied
+                  when you save the project.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="grid gap-2">
-                <Label htmlFor="project-images">Image URLs</Label>
-                <Textarea
-                  id="project-images"
-                  value={imagesInput}
-                  onChange={(event) => setImagesInput(event.target.value)}
-                  placeholder={
-                    "/images/my-project/photo1.png\n/images/my-project/photo2.png"
+              <CardContent className="grid gap-4">
+                {images.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {images.map((image) => (
+                      <div
+                        key={image}
+                        className="group relative aspect-video overflow-hidden rounded-md border bg-muted"
+                      >
+                        <Image
+                          src={image}
+                          alt="Project gallery image"
+                          fill
+                          unoptimized
+                          sizes="(min-width: 640px) 33vw, 50vw"
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          aria-label="Remove image"
+                          onClick={() =>
+                            setImages((current) =>
+                              current.filter((item) => item !== image)
+                            )
+                          }
+                          className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-md border bg-background/90 opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                          <X className="size-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <Label htmlFor="project-image-files">Upload images</Label>
+                <Input
+                  id="project-image-files"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(event) =>
+                    setImageFiles(Array.from(event.target.files ?? []))
                   }
-                  className="min-h-32"
+                />
+                {imageFiles.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {imageFiles.length} image(s) will be uploaded when you save.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {isAdmin && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Info JSON</CardTitle>
+                <CardDescription>
+                  JSON content blocks shown on the public project page.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  aria-label="Project info JSON"
+                  value={infoInput}
+                  onChange={(event) => setInfoInput(event.target.value)}
+                  placeholder='[{"type":"text","content":"Project details"}]'
+                  className="min-h-64 font-mono text-xs"
                 />
               </CardContent>
             </Card>
