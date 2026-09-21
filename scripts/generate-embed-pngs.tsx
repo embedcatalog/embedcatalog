@@ -20,11 +20,22 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 const embedKinds = ["license", "added", "organization"] as const
 const embedThemes = ["light", "dark"] as const
 type BuildProject = {
+  id: string
   slug: string
   github_url: string | null
   socials: Record<string, string> | null
   is_premium: boolean
 }
+
+type CustomEmbedRow = {
+  id: string
+  project_id: string
+  short_id: string
+  title: string
+  description: string
+}
+
+const customEmbedSize = getEmbedSize("organization")
 
 const outputRoot = join(process.cwd(), "out/embed")
 const font = await readFile(
@@ -43,6 +54,22 @@ function getEmbedTheme(theme: (typeof embedThemes)[number]) {
   return theme === "dark"
     ? { background: "#171717", border: "#344054", text: "#F9FAFB" }
     : { background: "#ffffff", border: "#D0D5DD", text: "#101828" }
+}
+
+function getCustomEmbedTheme(theme: (typeof embedThemes)[number]) {
+  return theme === "dark"
+    ? {
+        background: "#171717",
+        border: "#404040",
+        text: "#fafafa",
+        muted: "#a3a3a3",
+      }
+    : {
+        background: "#ffffff",
+        border: "#d4d4d4",
+        text: "#171717",
+        muted: "#737373",
+      }
 }
 
 function parseGithubRepo(url: string | undefined) {
@@ -187,13 +214,106 @@ async function generateEmbed(
   )
 }
 
+async function generateCustomEmbed(
+  slug: string,
+  embed: CustomEmbedRow,
+  theme: (typeof embedThemes)[number]
+) {
+  const colors = getCustomEmbedTheme(theme)
+  const lines = embed.description
+    ? [embed.title, embed.description]
+    : [embed.title]
+  const image = new ImageResponse(
+    React.createElement(
+      "div",
+      {
+        style: {
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: colors.background,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 4,
+          paddingLeft: 12,
+          paddingRight: 12,
+        },
+      },
+      React.createElement(
+        "div",
+        {
+          style: {
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: lines.length > 1 ? 2 : 0,
+          },
+        },
+        ...lines.map((line, index) =>
+          React.createElement(
+            "div",
+            {
+              key: line,
+              style: {
+                display: "flex",
+                color: index === 0 ? colors.text : colors.muted,
+                fontSize: 12,
+                fontWeight: 600,
+                fontFamily: "Geist SemiBold",
+                whiteSpace: "nowrap",
+                lineHeight: 1.2,
+              },
+            },
+            line
+          )
+        )
+      )
+    ),
+    {
+      ...customEmbedSize,
+      fonts: [
+        {
+          name: "Geist SemiBold",
+          data: font,
+          style: "normal",
+          weight: 600,
+        },
+      ],
+    }
+  )
+
+  const fileName =
+    theme === "light"
+      ? `${embed.short_id}.png`
+      : `${embed.short_id}.theme-${theme}.png`
+  const projectDirectory = join(outputRoot, slug)
+  await mkdir(projectDirectory, { recursive: true })
+  await writeFile(
+    join(projectDirectory, fileName),
+    Buffer.from(await image.arrayBuffer())
+  )
+}
+
 const { data: projects, error } = await supabase
   .from("projects")
-  .select("slug, github_url, socials, is_premium")
+  .select("id, slug, github_url, socials, is_premium")
   .eq("status", "published")
   .order("created_at", { ascending: false })
 
 if (error) throw new Error(`Failed to load projects: ${error.message}`)
+
+const projectIds = projects.map((project) => project.id)
+const slugById = new Map(projects.map((project) => [project.id, project.slug]))
+
+const { data: customEmbeds, error: customEmbedsError } = await supabase
+  .from("project_embeds")
+  .select("id, project_id, short_id, title, description")
+  .in("project_id", projectIds)
+
+if (customEmbedsError) {
+  throw new Error(`Failed to load custom embeds: ${customEmbedsError.message}`)
+}
 
 for (const project of projects) {
   const kinds = embedKinds.filter(
@@ -206,4 +326,13 @@ for (const project of projects) {
   }
 }
 
+for (const embed of customEmbeds as CustomEmbedRow[]) {
+  const slug = slugById.get(embed.project_id)
+  if (!slug) continue
+  for (const theme of embedThemes) {
+    await generateCustomEmbed(slug, embed, theme)
+  }
+}
+
 console.log(`Generated embed PNGs for ${projects.length} published projects.`)
+console.log(`Generated ${customEmbeds.length} custom embed PNGs.`)

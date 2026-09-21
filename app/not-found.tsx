@@ -88,13 +88,20 @@ function NotFound() {
 
       const { data: embeds } = await supabase
         .from("project_embeds")
-        .select("title, description, theme")
+        .select("id, short_id, title, description")
         .eq("project_id", project.id)
         .order("position", { ascending: true })
 
       if (cancelled) return
       setProject(project)
-      setCustomEmbeds(embeds ?? [])
+      setCustomEmbeds(
+        (embeds ?? []).map((embed) => ({
+          id: embed.id,
+          shortId: embed.short_id,
+          title: embed.title,
+          description: embed.description,
+        }))
+      )
       setLoading(false)
     }
 

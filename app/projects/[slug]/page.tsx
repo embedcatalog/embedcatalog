@@ -95,7 +95,7 @@ export default async function ProjectPage({
 
   const { data: customEmbeds } = await supabase
     .from("project_embeds")
-    .select("title, description, theme")
+    .select("id, short_id, title, description")
     .eq("project_id", project.id)
     .order("position", { ascending: true })
 
@@ -187,7 +187,12 @@ export default async function ProjectPage({
         projectName={project.name}
         externalUrl={project.url}
         isPremium={project.premium ?? false}
-        customEmbeds={customEmbeds ?? []}
+        customEmbeds={(customEmbeds ?? []).map((embed) => ({
+          id: embed.id,
+          shortId: embed.short_id,
+          title: embed.title,
+          description: embed.description,
+        }))}
       />
 
       <p className="mt-6 leading-relaxed">{project.description}</p>

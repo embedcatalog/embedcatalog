@@ -23,9 +23,9 @@ export type Database = {
         Row: {
           id: string
           project_id: string
+          short_id: string
           title: string
           description: string
-          theme: "light" | "dark"
           position: number
           created_at: string
           updated_at: string
@@ -33,9 +33,9 @@ export type Database = {
         Insert: {
           id?: string
           project_id: string
+          short_id?: string
           title: string
           description: string
-          theme?: "light" | "dark"
           position?: number
           created_at?: string
           updated_at?: string
@@ -104,7 +104,6 @@ export type Database = {
     Views: Record<string, never>
     Functions: Record<string, never>
     Enums: {
-      embed_theme: "light" | "dark"
       project_status: "draft" | "pending" | "published" | "rejected"
     }
     CompositeTypes: Record<string, never>

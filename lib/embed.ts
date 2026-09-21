@@ -143,14 +143,37 @@ function getPublicEmbedSrc(
   return `${siteUrl}/embed/${slug}/${getEmbedFileName(kind, theme)}`
 }
 
+function getCustomEmbedSize() {
+  return getEmbedSize("organization")
+}
+
+function getCustomEmbedFileName(shortId: string, theme: EmbedTheme = "light") {
+  if (theme === "light") {
+    return `${shortId}.png`
+  }
+  return `${shortId}.theme-${theme}.png`
+}
+
+function getPublicCustomEmbedSrc(
+  siteUrl: string,
+  slug: string,
+  shortId: string,
+  theme: EmbedTheme
+) {
+  return `${siteUrl}/embed/${slug}/${getCustomEmbedFileName(shortId, theme)}`
+}
+
 export {
   embedKinds,
   embedThemes,
   fetchGithubRepoMeta,
+  getCustomEmbedFileName,
+  getCustomEmbedSize,
   getEmbedFileName,
   getEmbedLines,
   getEmbedSize,
   getEmbedTheme,
+  getPublicCustomEmbedSrc,
   getPublicEmbedSrc,
   parseEmbedKind,
   themes,

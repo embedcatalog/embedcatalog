@@ -9,9 +9,7 @@ import {
   ChevronLeft,
   Copy,
   Loader2,
-  Moon,
   Plus,
-  Sun,
   Trash2,
   X,
 } from "lucide-react"
@@ -30,14 +28,17 @@ import { Label } from "components/ui/label"
 import { Textarea } from "components/ui/textarea"
 import { supabase } from "lib/supabase/client"
 
-type Theme = "light" | "dark"
-type Embed = { id: number; title: string; description: string; theme: Theme }
+type Embed = {
+  id: number
+  shortId?: string
+  title: string
+  description: string
+}
 
 const defaultEmbed = (id: number): Embed => ({
   id,
   title: "Built with EmbedCatalog",
   description: "A project worth checking out.",
-  theme: "light",
 })
 
 function escapeHtml(value: string) {
@@ -129,7 +130,7 @@ function EditProjectForm() {
 
       const { data: projectEmbeds, error: embedsError } = await supabase
         .from("project_embeds")
-        .select("id, title, description, theme, position")
+        .select("id, short_id, title, description, position")
         .eq("project_id", projectId as string)
         .order("position", { ascending: true })
 
@@ -145,9 +146,9 @@ function EditProjectForm() {
         setEmbeds(
           projectEmbeds.map((embed, index) => ({
             id: index + 1,
+            shortId: embed.short_id,
             title: embed.title,
             description: embed.description,
-            theme: embed.theme,
           }))
         )
       }
@@ -213,20 +214,12 @@ function EditProjectForm() {
   }
 
   function embedCode(embed: Embed) {
-    const colors =
-      embed.theme === "dark"
-        ? {
-            background: "#171717",
-            border: "#404040",
-            text: "#fafafa",
-            muted: "#a3a3a3",
-          }
-        : {
-            background: "#ffffff",
-            border: "#d4d4d4",
-            text: "#171717",
-            muted: "#737373",
-          }
+    const colors = {
+      background: "#ffffff",
+      border: "#d4d4d4",
+      text: "#171717",
+      muted: "#737373",
+    }
     return `<a href="${escapeHtml(projectUrl)}" target="_blank" rel="noreferrer noopener" style="display:inline-block;color:${colors.text};text-decoration:none"><span style="display:block;max-width:320px;border:1px solid ${colors.border};border-radius:4px;background:${colors.background};padding:14px 16px;font-family:Arial,sans-serif"><strong style="display:block;font-size:14px;line-height:20px">${escapeHtml(embed.title)}</strong><span style="display:block;margin-top:4px;color:${colors.muted};font-size:12px;line-height:18px">${escapeHtml(embed.description)}</span></span></a>`
   }
 
@@ -337,8 +330,10 @@ function EditProjectForm() {
         project_id: projectId as string,
         title: embed.title.trim() || name,
         description: embed.description.trim(),
-        theme: embed.theme,
         position,
+        // preserve the existing short_id (and its generated PNGs); the DB
+        // assigns a new one only for embeds that haven't been saved before
+        ...(embed.shortId ? { short_id: embed.shortId } : {}),
       }))
     )
 
@@ -565,20 +560,12 @@ function EditProjectForm() {
             </Button>
           </div>
           {embeds.map((embed, index) => {
-            const colors =
-              embed.theme === "dark"
-                ? {
-                    background: "#171717",
-                    border: "#404040",
-                    text: "#fafafa",
-                    muted: "#a3a3a3",
-                  }
-                : {
-                    background: "#ffffff",
-                    border: "#d4d4d4",
-                    text: "#171717",
-                    muted: "#737373",
-                  }
+            const colors = {
+              background: "#ffffff",
+              border: "#d4d4d4",
+              text: "#171717",
+              muted: "#737373",
+            }
             return (
               <Card key={embed.id}>
                 <CardHeader>
@@ -625,28 +612,6 @@ function EditProjectForm() {
                       }
                       maxLength={160}
                     />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Theme</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(["light", "dark"] as const).map((theme) => {
-                        const Icon = theme === "light" ? Sun : Moon
-                        return (
-                          <Button
-                            key={theme}
-                            type="button"
-                            variant={
-                              embed.theme === theme ? "secondary" : "outline"
-                            }
-                            className="capitalize"
-                            onClick={() => updateEmbed(embed.id, { theme })}
-                          >
-                            <Icon className="size-4" />
-                            {theme}
-                          </Button>
-                        )
-                      })}
-                    </div>
                   </div>
                 </CardContent>
                 <CardContent className="border-t pt-6">

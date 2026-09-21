@@ -15,7 +15,9 @@ import { Embed } from "components/ui/embed"
 import {
   type EmbedKind,
   type EmbedTheme,
+  getCustomEmbedSize,
   getEmbedSize,
+  getPublicCustomEmbedSrc,
   getPublicEmbedSrc,
 } from "lib/embed"
 import { siteConfig } from "lib/site"
@@ -116,85 +118,68 @@ function EmbedHtmlLine({ code }: { code: string }) {
   )
 }
 
-function buildCustomEmbedHtml({
+function buildEmbedImageHtml({
   projectUrl,
   title,
-  description,
-  theme,
+  embedSrc,
+  width,
+  height,
 }: {
   projectUrl: string
   title: string
-  description: string
-  theme: EmbedTheme
+  embedSrc: string
+  width: number
+  height: number
 }) {
-  const colors =
-    theme === "dark"
-      ? {
-          background: "#171717",
-          border: "#404040",
-          text: "#fafafa",
-          muted: "#a3a3a3",
-        }
-      : {
-          background: "#ffffff",
-          border: "#d4d4d4",
-          text: "#171717",
-          muted: "#737373",
-        }
-  return `<a href="${projectUrl}" target="_blank" rel="noreferrer noopener" style="display:inline-block;color:${colors.text};text-decoration:none"><span style="display:block;max-width:320px;border:1px solid ${colors.border};border-radius:4px;background:${colors.background};padding:14px 16px;font-family:Arial,sans-serif"><strong style="display:block;font-size:14px;line-height:20px">${title}</strong><span style="display:block;margin-top:4px;color:${colors.muted};font-size:12px;line-height:18px">${description}</span></span></a>`
+  return `<a href="${projectUrl}" target="_blank" rel="noreferrer noopener"><img src="${embedSrc}" alt="${title}" style="width: ${width}px; height: ${height}px;" width="${width}" height="${height}" /></a>`
 }
 
 function CustomEmbedCard({
+  slug,
+  shortId,
   projectUrl,
   title,
-  description,
-  theme,
 }: {
+  slug: string
+  shortId: string
   projectUrl: string
   title: string
-  description: string
-  theme: EmbedTheme
 }) {
-  const html = buildCustomEmbedHtml({ projectUrl, title, description, theme })
-  const colors =
-    theme === "dark"
-      ? {
-          background: "#171717",
-          border: "#404040",
-          text: "#fafafa",
-          muted: "#a3a3a3",
-        }
-      : {
-          background: "#ffffff",
-          border: "#d4d4d4",
-          text: "#171717",
-          muted: "#737373",
-        }
+  const [theme, setTheme] = React.useState<EmbedTheme>("light")
+  const { width, height } = getCustomEmbedSize()
+  const embedSrc = getPublicCustomEmbedSrc(siteConfig.url, slug, shortId, theme)
+  const html = buildEmbedImageHtml({
+    projectUrl,
+    title,
+    embedSrc,
+    width,
+    height,
+  })
 
   return (
     <Card className="gap-4 py-4 shadow-none">
       <CardHeader className="border-b px-4 pb-4">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardAction>
+          <ThemeSwitch theme={theme} onThemeChange={setTheme} />
+        </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 px-4">
-        <div
-          className="w-full max-w-xs rounded border p-4"
-          style={{
-            backgroundColor: colors.background,
-            borderColor: colors.border,
-            color: colors.text,
-          }}
+        <a
+          href={projectUrl}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="inline-flex w-fit transition-opacity hover:opacity-80"
         >
-          <p className="text-sm leading-5 font-semibold">{title}</p>
-          {description && (
-            <p
-              className="mt-1 text-xs leading-[18px]"
-              style={{ color: colors.muted }}
-            >
-              {description}
-            </p>
-          )}
-        </div>
+          <Image
+            key={embedSrc}
+            src={embedSrc}
+            alt={title}
+            width={width}
+            height={height}
+            unoptimized
+          />
+        </a>
         <EmbedHtmlLine code={html} />
       </CardContent>
     </Card>
@@ -246,7 +231,6 @@ function EmbedCard({
   const [theme, setTheme] = React.useState<EmbedTheme>("light")
   const { width, height } = getEmbedSize(kind)
   const embedSrc = getPublicEmbedSrc(siteConfig.url, slug, kind, theme)
-  const previewSrc = embedSrc
   const html = buildEmbedHtml({
     projectUrl,
     projectName,
@@ -274,8 +258,8 @@ function EmbedCard({
           className="inline-flex w-fit transition-opacity hover:opacity-80"
         >
           <Image
-            key={previewSrc}
-            src={previewSrc}
+            key={embedSrc}
+            src={embedSrc}
             alt={`${projectName} on ${siteConfig.name}`}
             width={width}
             height={height}
@@ -291,9 +275,10 @@ function EmbedCard({
 }
 
 export type CustomEmbed = {
+  id: string
+  shortId: string
   title: string
   description: string
-  theme: EmbedTheme
 }
 
 type EmbedTab = "default" | "premium" | "custom"
@@ -394,13 +379,13 @@ function ProjectEmbeds({
               This project hasn&rsquo;t added any custom embeds yet.
             </p>
           ) : (
-            customEmbeds.map((embed, index) => (
+            customEmbeds.map((embed) => (
               <CustomEmbedCard
-                key={index}
+                key={embed.id}
+                slug={slug}
+                shortId={embed.shortId}
                 projectUrl={externalUrl}
                 title={embed.title}
-                description={embed.description}
-                theme={embed.theme}
               />
             ))
           )}

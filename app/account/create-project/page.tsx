@@ -2,16 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import {
-  Check,
-  ChevronLeft,
-  Copy,
-  Loader2,
-  Moon,
-  Plus,
-  Sun,
-  Trash2,
-} from "lucide-react"
+import { Check, ChevronLeft, Copy, Loader2, Plus, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { useAuth } from "components/auth-provider"
@@ -28,14 +19,16 @@ import { Label } from "components/ui/label"
 import { Textarea } from "components/ui/textarea"
 import { supabase } from "lib/supabase/client"
 
-type Theme = "light" | "dark"
-type Embed = { id: number; title: string; description: string; theme: Theme }
+type Embed = {
+  id: number
+  title: string
+  description: string
+}
 
 const defaultEmbed = (id: number): Embed => ({
   id,
   title: "Built with EmbedCatalog",
   description: "A project worth checking out.",
-  theme: "light",
 })
 
 function escapeHtml(value: string) {
@@ -89,20 +82,12 @@ function CreateProjectPage() {
   }
 
   function embedCode(embed: Embed) {
-    const colors =
-      embed.theme === "dark"
-        ? {
-            background: "#171717",
-            border: "#404040",
-            text: "#fafafa",
-            muted: "#a3a3a3",
-          }
-        : {
-            background: "#ffffff",
-            border: "#d4d4d4",
-            text: "#171717",
-            muted: "#737373",
-          }
+    const colors = {
+      background: "#ffffff",
+      border: "#d4d4d4",
+      text: "#171717",
+      muted: "#737373",
+    }
     return `<a href="${escapeHtml(projectUrl)}" target="_blank" rel="noreferrer noopener" style="display:inline-block;color:${colors.text};text-decoration:none"><span style="display:block;max-width:320px;border:1px solid ${colors.border};border-radius:4px;background:${colors.background};padding:14px 16px;font-family:Arial,sans-serif"><strong style="display:block;font-size:14px;line-height:20px">${escapeHtml(embed.title)}</strong><span style="display:block;margin-top:4px;color:${colors.muted};font-size:12px;line-height:18px">${escapeHtml(embed.description)}</span></span></a>`
   }
 
@@ -178,7 +163,6 @@ function CreateProjectPage() {
             project_id: project.id,
             title: embed.title.trim() || name,
             description: embed.description.trim(),
-            theme: embed.theme,
             position,
           }))
         )
@@ -332,20 +316,12 @@ function CreateProjectPage() {
             </p>
           )}
           {embeds.map((embed, index) => {
-            const colors =
-              embed.theme === "dark"
-                ? {
-                    background: "#171717",
-                    border: "#404040",
-                    text: "#fafafa",
-                    muted: "#a3a3a3",
-                  }
-                : {
-                    background: "#ffffff",
-                    border: "#d4d4d4",
-                    text: "#171717",
-                    muted: "#737373",
-                  }
+            const colors = {
+              background: "#ffffff",
+              border: "#d4d4d4",
+              text: "#171717",
+              muted: "#737373",
+            }
             return (
               <Card key={embed.id}>
                 <CardHeader>
@@ -390,28 +366,6 @@ function CreateProjectPage() {
                       }
                       maxLength={160}
                     />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Theme</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(["light", "dark"] as const).map((theme) => {
-                        const Icon = theme === "light" ? Sun : Moon
-                        return (
-                          <Button
-                            key={theme}
-                            type="button"
-                            variant={
-                              embed.theme === theme ? "secondary" : "outline"
-                            }
-                            className="capitalize"
-                            onClick={() => updateEmbed(embed.id, { theme })}
-                          >
-                            <Icon className="size-4" />
-                            {theme}
-                          </Button>
-                        )
-                      })}
-                    </div>
                   </div>
                 </CardContent>
                 <CardContent className="border-t pt-6">
