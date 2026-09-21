@@ -35,8 +35,6 @@ type CustomEmbedRow = {
   description: string
 }
 
-const customEmbedSize = getEmbedSize("organization")
-
 const outputRoot = join(process.cwd(), "out/embed")
 const font = await readFile(
   join(process.cwd(), "assets/fonts/Geist-SemiBold.ttf")
@@ -220,9 +218,6 @@ async function generateCustomEmbed(
   theme: (typeof embedThemes)[number]
 ) {
   const colors = getCustomEmbedTheme(theme)
-  const lines = embed.description
-    ? [embed.title, embed.description]
-    : [embed.title]
   const image = new ImageResponse(
     React.createElement(
       "div",
@@ -231,13 +226,12 @@ async function generateCustomEmbed(
           width: "100%",
           height: "100%",
           display: "flex",
-          alignItems: "center",
+          flexDirection: "column",
           justifyContent: "center",
           background: colors.background,
           border: `1px solid ${colors.border}`,
           borderRadius: 4,
-          paddingLeft: 12,
-          paddingRight: 12,
+          padding: "14px 16px",
         },
       },
       React.createElement(
@@ -245,33 +239,36 @@ async function generateCustomEmbed(
         {
           style: {
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: lines.length > 1 ? 2 : 0,
+            color: colors.text,
+            fontSize: 14,
+            fontWeight: 600,
+            fontFamily: "Geist SemiBold",
+            lineHeight: 1.4,
           },
         },
-        ...lines.map((line, index) =>
-          React.createElement(
+        embed.title
+      ),
+      embed.description
+        ? React.createElement(
             "div",
             {
-              key: line,
               style: {
                 display: "flex",
-                color: index === 0 ? colors.text : colors.muted,
+                marginTop: 4,
+                color: colors.muted,
                 fontSize: 12,
                 fontWeight: 600,
                 fontFamily: "Geist SemiBold",
-                whiteSpace: "nowrap",
-                lineHeight: 1.2,
+                lineHeight: 1.5,
               },
             },
-            line
+            embed.description
           )
-        )
-      )
+        : null
     ),
     {
-      ...customEmbedSize,
+      width: 320,
+      height: 84,
       fonts: [
         {
           name: "Geist SemiBold",

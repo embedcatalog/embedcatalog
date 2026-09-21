@@ -144,7 +144,7 @@ function getPublicEmbedSrc(
 }
 
 function getCustomEmbedSize() {
-  return getEmbedSize("organization")
+  return { width: 320, height: 84 }
 }
 
 function getCustomEmbedFileName(shortId: string, theme: EmbedTheme = "light") {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
 import { ProjectsPage } from "components/projects-page"
 import { siteConfig } from "lib/site"
@@ -41,7 +42,9 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <ProjectsPage />
+      <Suspense fallback={null}>
+        <ProjectsPage />
+      </Suspense>
     </main>
   )
 }

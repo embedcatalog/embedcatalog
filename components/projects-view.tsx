@@ -1,10 +1,15 @@
 "use client"
 
 import * as React from "react"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Search, X } from "lucide-react"
 
 import { Input } from "components/ui/input"
 import { ProjectsGrid, type Project } from "components/projects-grid"
+
+function parseTagsParam(value: string | null) {
+  return value ? value.split(",").filter(Boolean) : []
+}
 
 function ProjectsView({
   projects,
@@ -13,10 +18,34 @@ function ProjectsView({
   projects: Project[]
   showFilters?: boolean
 }) {
-  const [query, setQuery] = React.useState("")
-  const [newOnly, setNewOnly] = React.useState(false)
-  const [selectedTags, setSelectedTags] = React.useState<string[]>([])
-  const [sort, setSort] = React.useState<"desc" | "asc">("desc")
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const [query, setQuery] = React.useState(() => searchParams.get("q") ?? "")
+  const [newOnly, setNewOnly] = React.useState(
+    () => searchParams.get("status") === "new"
+  )
+  const [selectedTags, setSelectedTags] = React.useState<string[]>(() =>
+    parseTagsParam(searchParams.get("tags"))
+  )
+  const [sort, setSort] = React.useState<"desc" | "asc">(() =>
+    searchParams.get("sort") === "asc" ? "asc" : "desc"
+  )
+
+  // keep the URL in sync so filters are shareable/bookmarkable
+  React.useEffect(() => {
+    const params = new URLSearchParams()
+    if (query) params.set("q", query)
+    if (newOnly) params.set("status", "new")
+    if (selectedTags.length > 0) params.set("tags", selectedTags.join(","))
+    if (sort === "asc") params.set("sort", "asc")
+
+    const queryString = params.toString()
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+      scroll: false,
+    })
+  }, [query, newOnly, selectedTags, sort, pathname, router])
 
   const allTags = React.useMemo(() => {
     const tags = new Set<string>()
