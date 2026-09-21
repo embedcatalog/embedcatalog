@@ -245,8 +245,8 @@ function EmbedCard({
 
   const [theme, setTheme] = React.useState<EmbedTheme>("light")
   const { width, height } = getEmbedSize(kind)
-  const previewSrc = `/embed/${slug}/${kind}/${theme}/opengraph-image`
   const embedSrc = getPublicEmbedSrc(siteConfig.url, slug, kind, theme)
+  const previewSrc = embedSrc
   const html = buildEmbedHtml({
     projectUrl,
     projectName,
