@@ -5,6 +5,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Search, X } from "lucide-react"
 
 import { Input } from "components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "components/ui/select"
 import { ProjectsGrid, type Project } from "components/projects-grid"
 
 function parseTagsParam(value: string | null) {
@@ -177,15 +184,21 @@ function ProjectsView({
               </button>
             )}
           </div>
-          <select
-            aria-label="Sort by date"
+          <Select
             value={sort}
-            onChange={(event) => setSort(event.target.value as "desc" | "asc")}
-            className="ml-auto h-9 w-[150px] shrink-0 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            onValueChange={(value) => setSort(value as "desc" | "asc")}
           >
-            <option value="desc">Date: descending</option>
-            <option value="asc">Date: ascending</option>
-          </select>
+            <SelectTrigger
+              aria-label="Sort by date"
+              className="ml-auto w-[180px]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Date: descending</SelectItem>
+              <SelectItem value="asc">Date: ascending</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <ProjectsGrid projects={sorted} onTagClick={setQuery} />
