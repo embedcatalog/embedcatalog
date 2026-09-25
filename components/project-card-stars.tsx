@@ -1,47 +1,17 @@
-"use client"
-
-import * as React from "react"
 import { Star } from "lucide-react"
 
 import { formatCount, parseGithubRepo } from "lib/github"
 
-function ProjectCardStars({ githubUrl }: { githubUrl: string }) {
-  const repo = React.useMemo(() => parseGithubRepo(githubUrl), [githubUrl])
-  const [stars, setStars] = React.useState<number | null>(null)
+function ProjectCardStars({
+  githubUrl,
+  stars,
+}: {
+  githubUrl: string
+  stars: number | null | undefined
+}) {
+  const repo = parseGithubRepo(githubUrl)
 
-  React.useEffect(() => {
-    if (!repo) {
-      return
-    }
-
-    let cancelled = false
-
-    async function load() {
-      try {
-        const res = await fetch(`https://api.github.com/repos/${repo}`, {
-          headers: { Accept: "application/vnd.github+json" },
-          cache: "no-store",
-        })
-        if (!res.ok) {
-          return
-        }
-        const data = (await res.json()) as { stargazers_count?: number }
-        if (!cancelled && typeof data.stargazers_count === "number") {
-          setStars(data.stargazers_count)
-        }
-      } catch {
-        // ignore network errors
-      }
-    }
-
-    load()
-
-    return () => {
-      cancelled = true
-    }
-  }, [repo])
-
-  if (!repo || stars === null) {
+  if (!repo || stars == null) {
     return null
   }
 
@@ -51,7 +21,7 @@ function ProjectCardStars({ githubUrl }: { githubUrl: string }) {
       target="_blank"
       rel="noreferrer noopener"
       aria-label={`${formatCount(stars)} stars`}
-      className="hover:bg-accent hover:text-foreground relative z-10 inline-flex h-7 items-center gap-1 rounded-md px-1.5 text-xs font-medium transition-colors"
+      className="relative z-10 inline-flex h-7 items-center gap-1 rounded-md px-1.5 text-xs font-medium transition-colors hover:bg-accent hover:text-foreground"
     >
       <Star className="size-3.5" />
       <span className="tabular-nums">{formatCount(stars)}</span>

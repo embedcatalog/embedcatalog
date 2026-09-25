@@ -9,7 +9,7 @@ async function getPublishedProjects(): Promise<Project[]> {
   const { data, error } = await supabase
     .from("projects")
     .select(
-      "id, slug, name, description, url, github_url, images, tags, socials, info, is_premium, created_at"
+      "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, created_at"
     )
     .eq("status", "published")
     .order("created_at", { ascending: false })
@@ -32,6 +32,13 @@ async function getPublishedProjects(): Promise<Project[]> {
     premium: project.is_premium,
     url: project.url,
     githubUrl: project.github_url ?? project.socials?.github ?? undefined,
+    githubStats: {
+      stars: project.github_stars,
+      forks: project.github_forks,
+      contributors: project.github_contributors,
+      license: project.github_license,
+      updatedAt: project.github_stats_updated_at,
+    },
     images: (project.images ?? []).map(getProjectImageUrl),
     tags: project.tags ?? [],
     createdAt: project.created_at,

@@ -119,34 +119,6 @@ function ProjectsView({
 
           <div>
             <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              Sort by date
-            </h3>
-            <div className="flex flex-col gap-2">
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <input
-                  type="radio"
-                  name="sort"
-                  checked={sort === "desc"}
-                  onChange={() => setSort("desc")}
-                  className="size-4 accent-primary"
-                />
-                <span>Desc</span>
-              </label>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <input
-                  type="radio"
-                  name="sort"
-                  checked={sort === "asc"}
-                  onChange={() => setSort("asc")}
-                  className="size-4 accent-primary"
-                />
-                <span>Asc</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
               Status
             </h3>
             <label className="flex cursor-pointer items-center gap-2 text-sm">
@@ -185,24 +157,35 @@ function ProjectsView({
       )}
 
       <div className="flex flex-col gap-4">
-        <div className="relative max-w-sm">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by name, description or tag..."
-            className="pl-9"
-          />
-          {query && (
-            <button
-              type="button"
-              aria-label="Clear search"
-              onClick={() => setQuery("")}
-              className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="size-4" />
-            </button>
-          )}
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="relative max-w-sm min-w-0 flex-1">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search by name, description or tag..."
+              className="pl-9"
+            />
+            {query && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => setQuery("")}
+                className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+          <select
+            aria-label="Sort by date"
+            value={sort}
+            onChange={(event) => setSort(event.target.value as "desc" | "asc")}
+            className="ml-auto h-9 w-[150px] shrink-0 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          >
+            <option value="desc">Date: descending</option>
+            <option value="asc">Date: ascending</option>
+          </select>
         </div>
 
         <ProjectsGrid projects={sorted} onTagClick={setQuery} />

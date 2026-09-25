@@ -53,6 +53,14 @@ export type ProjectSocials = {
   github?: string
 }
 
+export type ProjectGithubStatsData = {
+  stars: number | null
+  forks: number | null
+  contributors: number | null
+  license: string | null
+  updatedAt: string | null
+}
+
 export type Project = {
   id: string
   slug: string
@@ -62,6 +70,7 @@ export type Project = {
   premium?: boolean
   url: string
   githubUrl?: string
+  githubStats?: ProjectGithubStatsData
   images: string[]
   tags: string[]
   createdAt: string
@@ -131,7 +140,7 @@ function ProjectsGrid({
                 aria-label={`Link to ${project.name}`}
                 className="flex h-8 items-center rounded-md border px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
-                link
+                Visit
               </a>
             </CardAction>
           </CardHeader>
@@ -152,8 +161,11 @@ function ProjectsGrid({
           <CardFooter className="mt-auto justify-between text-xs text-muted-foreground">
             <span>Added {formatDate(project.createdAt)}</span>
             <div className="relative z-10 flex items-center gap-0.5">
-              {project.socials?.github && (
-                <ProjectCardStars githubUrl={project.socials.github} />
+              {project.githubUrl && (
+                <ProjectCardStars
+                  githubUrl={project.githubUrl}
+                  stars={project.githubStats?.stars}
+                />
               )}
               {project.socials?.twitter && (
                 <a

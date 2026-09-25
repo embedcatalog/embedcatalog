@@ -118,8 +118,13 @@ function ProjectDetail({
         </div>
       </div>
 
-      {project.socials?.github && (
-        <ProjectGithubStats githubUrl={project.socials.github} />
+      {project.githubUrl && (
+        <ProjectGithubStats
+          key={project.id}
+          projectId={project.id}
+          githubUrl={project.githubUrl}
+          initialStats={project.githubStats}
+        />
       )}
       <div className="mt-6">
         <ImageCarousel images={project.images} alt={project.name} />

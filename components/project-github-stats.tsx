@@ -2,101 +2,59 @@
 
 import * as React from "react"
 
-import { formatCount, parseGithubRepo, parseLinkHeaderTotal } from "lib/github"
+import { type ProjectGithubStatsData } from "components/projects-grid"
+import { formatCount, parseGithubRepo } from "lib/github"
+import { supabase } from "lib/supabase/client"
 
-type GithubStats = {
-  stars: number
-  forks: number
-  contributors: number | null
-  license: string | null
-}
-
-function ProjectGithubStats({ githubUrl }: { githubUrl: string }) {
-  const repo = React.useMemo(() => parseGithubRepo(githubUrl), [githubUrl])
-  const [stats, setStats] = React.useState<GithubStats | null>(null)
+function ProjectGithubStats({
+  projectId,
+  githubUrl,
+  initialStats,
+}: {
+  projectId: string
+  githubUrl: string
+  initialStats?: ProjectGithubStatsData
+}) {
+  const repo = parseGithubRepo(githubUrl)
+  const [stats, setStats] = React.useState<ProjectGithubStatsData | null>(
+    initialStats ?? null
+  )
 
   React.useEffect(() => {
-    if (!repo) {
-      return
-    }
-
     let cancelled = false
 
     async function load() {
       try {
-        const headers = { Accept: "application/vnd.github+json" }
-
-        const [repoRes, contributorsRes] = await Promise.all([
-          fetch(`https://api.github.com/repos/${repo}`, {
-            headers,
-            cache: "no-store",
-          }),
-          fetch(
-            `https://api.github.com/repos/${repo}/contributors?per_page=1&anon=true`,
-            {
-              headers,
-              cache: "no-store",
-            }
-          ),
-        ])
-
-        if (!repoRes.ok || cancelled) {
-          return
-        }
-
-        const repoData = (await repoRes.json()) as {
-          stargazers_count?: number
-          forks_count?: number
-          license?: { spdx_id?: string | null } | null
-        }
-
-        let contributors: number | null = null
-        if (contributorsRes.ok) {
-          const fromLink = parseLinkHeaderTotal(
-            contributorsRes.headers.get("Link")
+        const { data } = await supabase
+          .from("projects")
+          .select(
+            "github_stars, github_forks, github_contributors, github_license, github_stats_updated_at"
           )
-          if (fromLink !== null) {
-            contributors = fromLink
-          } else {
-            const list = (await contributorsRes.json()) as unknown[]
-            if (Array.isArray(list)) {
-              contributors = list.length
-            }
-          }
-        }
+          .eq("id", projectId)
+          .maybeSingle()
 
-        if (
-          cancelled ||
-          typeof repoData.stargazers_count !== "number" ||
-          typeof repoData.forks_count !== "number"
-        ) {
-          return
-        }
-
-        const license =
-          repoData.license?.spdx_id && repoData.license.spdx_id !== "NOASSERTION"
-            ? repoData.license.spdx_id
-            : null
+        if (cancelled || !data) return
 
         setStats({
-          stars: repoData.stargazers_count,
-          forks: repoData.forks_count,
-          contributors,
-          license,
+          stars: data.github_stars,
+          forks: data.github_forks,
+          contributors: data.github_contributors,
+          license: data.github_license,
+          updatedAt: data.github_stats_updated_at,
         })
       } catch {
-        // ignore network errors
+        // Keep the build-time stats if Supabase is temporarily unavailable.
       }
     }
 
-    load()
+    void load()
 
     return () => {
       cancelled = true
     }
-  }, [repo])
+  }, [projectId])
 
-  if (!repo || !stats) {
+  if (!repo || !stats || stats.stars === null || stats.forks === null) {
     return null
   }
 
@@ -140,14 +98,14 @@ function ProjectGithubStats({ githubUrl }: { githubUrl: string }) {
           target="_blank"
           rel="noreferrer noopener"
           aria-label={`${item.value} ${item.label.toLowerCase()}`}
-          className={`hover:bg-accent flex flex-1 flex-col items-center justify-center gap-0.5 px-4 py-3 transition-colors ${
+          className={`flex flex-1 flex-col items-center justify-center gap-0.5 px-4 py-3 transition-colors hover:bg-accent ${
             index > 0 ? "border-l" : ""
           }`}
         >
-          <span className="text-foreground text-base font-semibold tabular-nums">
+          <span className="text-base font-semibold text-foreground tabular-nums">
             {item.value}
           </span>
-          <span className="text-muted-foreground text-xs">{item.label}</span>
+          <span className="text-xs text-muted-foreground">{item.label}</span>
         </a>
       ))}
     </div>

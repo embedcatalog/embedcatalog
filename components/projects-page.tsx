@@ -22,13 +22,6 @@ function ProjectsSkeleton() {
           <SkeletonBlock className="h-3 w-10" />
         </div>
         <div>
-          <SkeletonBlock className="mb-3 h-3 w-20" />
-          <div className="flex flex-col gap-3">
-            <SkeletonBlock className="h-4 w-14" />
-            <SkeletonBlock className="h-4 w-14" />
-          </div>
-        </div>
-        <div>
           <SkeletonBlock className="mb-3 h-3 w-12" />
           <SkeletonBlock className="h-4 w-24" />
         </div>
@@ -44,7 +37,10 @@ function ProjectsSkeleton() {
       </aside>
 
       <div className="flex flex-col gap-4">
-        <SkeletonBlock className="h-10 w-full max-w-sm" />
+        <div className="flex items-center gap-2">
+          <SkeletonBlock className="h-10 w-full max-w-sm" />
+          <SkeletonBlock className="h-9 w-[150px] shrink-0" />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }, (_, index) => (
             <div
@@ -81,6 +77,11 @@ function mapProject(project: {
   description: string
   url: string
   github_url: string | null
+  github_stars: number | null
+  github_forks: number | null
+  github_contributors: number | null
+  github_license: string | null
+  github_stats_updated_at: string | null
   images: string[] | null
   tags: string[] | null
   socials: Record<string, string> | null
@@ -99,6 +100,13 @@ function mapProject(project: {
     premium: project.is_premium,
     url: project.url,
     githubUrl: project.github_url ?? project.socials?.github,
+    githubStats: {
+      stars: project.github_stars,
+      forks: project.github_forks,
+      contributors: project.github_contributors,
+      license: project.github_license,
+      updatedAt: project.github_stats_updated_at,
+    },
     images: (project.images ?? []).map(getProjectImageUrl),
     tags: project.tags ?? [],
     createdAt: project.created_at,
@@ -117,7 +125,7 @@ function ProjectsPage() {
     supabase
       .from("projects")
       .select(
-        "id, slug, name, description, url, github_url, images, tags, socials, info, is_premium, created_at"
+        "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, created_at"
       )
       .eq("status", "published")
       .order("created_at", { ascending: false })

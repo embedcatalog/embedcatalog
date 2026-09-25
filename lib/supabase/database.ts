@@ -52,6 +52,11 @@ export type Database = {
           description: string
           url: string
           github_url: string | null
+          github_stars: number | null
+          github_forks: number | null
+          github_contributors: number | null
+          github_license: string | null
+          github_stats_updated_at: string | null
           tags: string[] | null
           socials: Record<string, string> | null
           images: string[] | null
@@ -70,6 +75,11 @@ export type Database = {
           description: string
           url: string
           github_url?: string | null
+          github_stars?: number | null
+          github_forks?: number | null
+          github_contributors?: number | null
+          github_license?: string | null
+          github_stats_updated_at?: string | null
           tags?: string[] | null
           socials?: Record<string, string> | null
           images?: string[] | null
@@ -88,6 +98,11 @@ export type Database = {
           description?: string
           url?: string
           github_url?: string | null
+          github_stars?: number | null
+          github_forks?: number | null
+          github_contributors?: number | null
+          github_license?: string | null
+          github_stats_updated_at?: string | null
           tags?: string[] | null
           socials?: Record<string, string> | null
           images?: string[] | null
