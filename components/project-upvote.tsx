@@ -86,7 +86,7 @@ function ProjectUpvote({
     <div className="flex flex-col items-start gap-1">
       <Button
         type="button"
-        variant={hasUpvoted ? "secondary" : "outline"}
+        variant={hasUpvoted ? "secondary" : "default"}
         size="sm"
         onClick={() => void toggleUpvote()}
         disabled={authLoading || checkingVote || saving}
@@ -99,13 +99,17 @@ function ProjectUpvote({
         }
         aria-pressed={hasUpvoted}
         title={user ? undefined : "Sign in to upvote"}
+        className="h-9 gap-1.5 px-3 shadow-sm"
       >
         {saving || checkingVote ? (
           <LoaderCircle className="size-4 animate-spin" />
         ) : (
           <ArrowUp className="size-4" />
         )}
-        {count.toLocaleString("en-US")}
+        <span>{hasUpvoted ? "Upvoted" : "Upvote"}</span>
+        <span className="rounded-sm bg-background/15 px-1.5 py-0.5 text-xs tabular-nums">
+          {count.toLocaleString("en-US")}
+        </span>
       </Button>
       {error && (
         <p className="text-xs text-destructive" role="alert">

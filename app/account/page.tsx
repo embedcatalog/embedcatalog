@@ -35,12 +35,16 @@ type Project = {
   created_at: string
 }
 
-function AccountPage() {
+function AccountPage({
+  initialSection = "settings",
+}: {
+  initialSection?: "settings" | "projects"
+}) {
   const router = useRouter()
   const { user, loading, isAdmin, signOut } = useAuth()
   const [activeSection, setActiveSection] = React.useState<
     "settings" | "projects"
-  >("settings")
+  >(initialSection)
   const [projects, setProjects] = React.useState<Project[]>([])
   const [projectsLoading, setProjectsLoading] = React.useState(false)
   const [projectsError, setProjectsError] = React.useState<string | null>(null)
@@ -266,4 +270,5 @@ function AccountPage() {
   )
 }
 
+export { AccountPage }
 export default AccountPage

@@ -78,10 +78,6 @@ function ProjectDetail({
                 projectId={project.id}
                 initialCount={project.impressionsCount}
               />
-              <ProjectUpvote
-                projectId={project.id}
-                initialCount={project.upvotesCount}
-              />
             </div>
           </div>
 
@@ -124,9 +120,13 @@ function ProjectDetail({
               </div>
             )}
             <CopyLinkButton path={`/projects/${project.slug}`} />
+            <ProjectUpvote
+              projectId={project.id}
+              initialCount={project.upvotesCount}
+            />
             <Button asChild>
               <a href={project.url} target="_blank" rel="noreferrer noopener">
-                Link
+                Visit
               </a>
             </Button>
           </div>

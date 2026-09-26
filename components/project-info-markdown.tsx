@@ -2,6 +2,19 @@ import * as React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
+import { CopyBlock } from "components/copy-block"
+
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node)
+  }
+  if (Array.isArray(node)) return node.map(extractText).join("")
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return extractText(node.props.children)
+  }
+  return ""
+}
+
 function ProjectInfoMarkdown({ content }: { content?: string }) {
   if (!content?.trim()) return null
 
@@ -58,9 +71,7 @@ function ProjectInfoMarkdown({ content }: { content?: string }) {
             </blockquote>
           ),
           pre: ({ children }) => (
-            <pre className="my-4 overflow-x-auto rounded-md border bg-muted p-4 text-sm leading-relaxed">
-              {children}
-            </pre>
+            <CopyBlock code={extractText(children)} className="my-4" />
           ),
           code: ({ children, className }) => (
             <code

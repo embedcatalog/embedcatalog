@@ -87,7 +87,11 @@ const plans: Plan[] = [
     price: "$0",
     period: "forever",
     description: "Get listed in the catalog so people can find your project.",
-    features: ["Listed on the platform", "Discoverable in the catalog"],
+    features: [
+      "Listed on the platform",
+      "Discoverable in the catalog",
+      "Create a custom embed for your README or website",
+    ],
   },
   {
     name: "Premium",

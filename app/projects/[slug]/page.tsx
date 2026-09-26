@@ -72,11 +72,20 @@ export async function generateMetadata({
       title: `${project.name} | ${siteConfig.name}`,
       description: project.description,
       url: canonical,
+      images: [
+        {
+          url: `${canonical}/opengraph-image`,
+          width: 1200,
+          height: 630,
+          alt: `${project.name} - ${siteConfig.name}`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: `${project.name} | ${siteConfig.name}`,
       description: project.description,
+      images: [`${canonical}/opengraph-image`],
     },
   }
 }
@@ -132,10 +141,6 @@ export default async function ProjectPage({
                 projectId={project.id}
                 initialCount={project.impressionsCount}
               />
-              <ProjectUpvote
-                projectId={project.id}
-                initialCount={project.upvotesCount}
-              />
             </div>
           </div>
 
@@ -180,9 +185,14 @@ export default async function ProjectPage({
 
             <CopyLinkButton path={`/projects/${project.slug}`} />
 
+            <ProjectUpvote
+              projectId={project.id}
+              initialCount={project.upvotesCount}
+            />
+
             <Button asChild>
               <a href={project.url} target="_blank" rel="noreferrer noopener">
-                Link
+                Visit
               </a>
             </Button>
           </div>
