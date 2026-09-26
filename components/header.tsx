@@ -80,107 +80,94 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
           {githubSlot}
           <div className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
-            {!loading && (
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label={
-                      user
-                        ? `Open account menu for ${displayName}`
-                        : "Open sign in menu"
-                    }
-                    className="size-9 overflow-hidden rounded-full p-0"
-                  >
-                    {avatarUrl ? (
-                      <Image
-                        src={avatarUrl}
-                        alt=""
-                        width={36}
-                        height={36}
-                        unoptimized
-                        className="size-full cursor-pointer object-cover"
-                      />
-                    ) : (
-                      <UserRound className="size-4" />
-                    )}
-                  </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content
-                    align="end"
-                    sideOffset={8}
-                    className="z-[60] min-w-48 rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
-                  >
-                    {user ? (
-                      <>
-                        <DropdownMenu.Label className="px-2 py-1.5 text-xs text-muted-foreground">
-                          {user.email}
-                        </DropdownMenu.Label>
-                        <DropdownMenu.Separator className="my-1 h-px bg-border" />
-                        <DropdownMenu.Item asChild>
-                          <Link
-                            href="/account/create-project"
-                            className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
-                          >
-                            <Plus className="size-4" />
-                            Create project
-                          </Link>
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item asChild>
-                          <Link
-                            href="/account"
-                            className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
-                          >
-                            <Settings className="size-4" />
-                            Settings
-                          </Link>
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item asChild>
-                          <Link
-                            href="/account/projects"
-                            className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
-                          >
-                            <FolderKanban className="size-4" />
-                            My projects
-                          </Link>
-                        </DropdownMenu.Item>
-                        {isAdmin && (
-                          <DropdownMenu.Item asChild>
-                            <Link
-                              href="/account/admin"
-                              className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
-                            >
-                              <ShieldCheck className="size-4" />
-                              Admin
-                            </Link>
-                          </DropdownMenu.Item>
-                        )}
-                        <DropdownMenu.Separator className="my-1 h-px bg-border" />
-                        <DropdownMenu.Item
-                          onSelect={() => void signOut()}
-                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
-                        >
-                          <LogOut className="size-4" />
-                          Sign out
-                        </DropdownMenu.Item>
-                      </>
-                    ) : (
+            {!loading &&
+              (user ? (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label={`Open account menu for ${displayName}`}
+                      className="size-9 overflow-hidden rounded-full p-0"
+                    >
+                      {avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt=""
+                          width={36}
+                          height={36}
+                          unoptimized
+                          className="size-full cursor-pointer object-cover"
+                        />
+                      ) : (
+                        <UserRound className="size-4" />
+                      )}
+                    </Button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      align="end"
+                      sideOffset={8}
+                      className="z-[60] min-w-48 rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
+                    >
+                      <DropdownMenu.Label className="px-2 py-1.5 text-xs text-muted-foreground">
+                        {user.email}
+                      </DropdownMenu.Label>
+                      <DropdownMenu.Separator className="my-1 h-px bg-border" />
                       <DropdownMenu.Item asChild>
                         <Link
-                          href="/login"
+                          href="/account/create-project"
                           className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
                         >
-                          <UserRound className="size-4" />
-                          Sign in
+                          <Plus className="size-4" />
+                          Create project
                         </Link>
                       </DropdownMenu.Item>
-                    )}
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
-            )}
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/account"
+                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
+                        >
+                          <Settings className="size-4" />
+                          Settings
+                        </Link>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/account/projects"
+                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
+                        >
+                          <FolderKanban className="size-4" />
+                          My projects
+                        </Link>
+                      </DropdownMenu.Item>
+                      {isAdmin && (
+                        <DropdownMenu.Item asChild>
+                          <Link
+                            href="/account/admin"
+                            className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
+                          >
+                            <ShieldCheck className="size-4" />
+                            Admin
+                          </Link>
+                        </DropdownMenu.Item>
+                      )}
+                      <DropdownMenu.Separator className="my-1 h-px bg-border" />
+                      <DropdownMenu.Item
+                        onSelect={() => void signOut()}
+                        className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
+                      >
+                        <LogOut className="size-4" />
+                        Sign out
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              ) : (
+                <Button size="sm" variant="outline" asChild>
+                  <Link href="/login">Sign in</Link>
+                </Button>
+              ))}
             <Button size="sm" asChild>
               <Link href="/submit">Submit</Link>
             </Button>
