@@ -43,6 +43,20 @@ export type Database = {
         Update: never
         Relationships: []
       }
+      project_upvotes: {
+        Row: {
+          project_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          project_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: never
+        Relationships: []
+      }
       projects: {
         Row: {
           id: string
@@ -61,6 +75,8 @@ export type Database = {
           socials: Record<string, string> | null
           images: string[] | null
           info: unknown | null
+          impressions_count: number
+          upvotes_count: number
           status: "draft" | "pending" | "published" | "rejected"
           submission_comment: string | null
           is_premium: boolean
@@ -84,6 +100,8 @@ export type Database = {
           socials?: Record<string, string> | null
           images?: string[] | null
           info?: unknown | null
+          impressions_count?: number
+          upvotes_count?: number
           status?: "draft" | "pending" | "published" | "rejected"
           submission_comment?: string | null
           is_premium?: boolean
@@ -107,6 +125,8 @@ export type Database = {
           socials?: Record<string, string> | null
           images?: string[] | null
           info?: unknown | null
+          impressions_count?: number
+          upvotes_count?: number
           status?: "draft" | "pending" | "published" | "rejected"
           submission_comment?: string | null
           is_premium?: boolean
@@ -117,7 +137,12 @@ export type Database = {
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      record_project_impressions: {
+        Args: { project_ids: string[] }
+        Returns: undefined
+      }
+    }
     Enums: {
       project_status: "draft" | "pending" | "published" | "rejected"
     }

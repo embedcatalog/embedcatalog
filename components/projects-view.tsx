@@ -14,6 +14,8 @@ import {
 } from "components/ui/select"
 import { ProjectsGrid, type Project } from "components/projects-grid"
 
+type SortOption = "desc" | "asc" | "upvotes" | "impressions"
+
 function parseTagsParam(value: string | null) {
   return value ? value.split(",").filter(Boolean) : []
 }
@@ -33,26 +35,33 @@ function ProjectsView({
   const [newOnly, setNewOnly] = React.useState(
     () => searchParams.get("status") === "new"
   )
+  const [premiumOnly, setPremiumOnly] = React.useState(
+    () => searchParams.get("premium") === "1"
+  )
   const [selectedTags, setSelectedTags] = React.useState<string[]>(() =>
     parseTagsParam(searchParams.get("tags"))
   )
-  const [sort, setSort] = React.useState<"desc" | "asc">(() =>
-    searchParams.get("sort") === "asc" ? "asc" : "desc"
-  )
+  const [sort, setSort] = React.useState<SortOption>(() => {
+    const value = searchParams.get("sort")
+    return value === "asc" || value === "upvotes" || value === "impressions"
+      ? value
+      : "desc"
+  })
 
   // keep the URL in sync so filters are shareable/bookmarkable
   React.useEffect(() => {
     const params = new URLSearchParams()
     if (query) params.set("q", query)
     if (newOnly) params.set("status", "new")
+    if (premiumOnly) params.set("premium", "1")
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","))
-    if (sort === "asc") params.set("sort", "asc")
+    if (sort !== "desc") params.set("sort", sort)
 
     const queryString = params.toString()
     router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
       scroll: false,
     })
-  }, [query, newOnly, selectedTags, sort, pathname, router])
+  }, [query, newOnly, premiumOnly, selectedTags, sort, pathname, router])
 
   const allTags = React.useMemo(() => {
     const tags = new Set<string>()
@@ -74,15 +83,21 @@ function ProjectsView({
         project.description.toLowerCase().includes(normalizedQuery) ||
         project.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery))
       const matchesNew = !newOnly || project.isNew
+      const matchesPremium = !premiumOnly || project.premium
       const matchesTags =
         selectedTags.length === 0 ||
         selectedTags.some((tag) => project.tags.includes(tag))
-      return matchesQuery && matchesNew && matchesTags
+      return matchesQuery && matchesNew && matchesPremium && matchesTags
     })
-  }, [projects, normalizedQuery, newOnly, selectedTags])
+  }, [projects, normalizedQuery, newOnly, premiumOnly, selectedTags])
 
   const sorted = React.useMemo(() => {
     return [...filtered].sort((a, b) => {
+      if (sort === "upvotes") return b.upvotesCount - a.upvotesCount
+      if (sort === "impressions") {
+        return b.impressionsCount - a.impressionsCount
+      }
+
       const diff =
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       return sort === "desc" ? -diff : diff
@@ -98,10 +113,12 @@ function ProjectsView({
   function clearFilters() {
     setQuery("")
     setNewOnly(false)
+    setPremiumOnly(false)
     setSelectedTags([])
   }
 
-  const hasActiveFilters = query !== "" || newOnly || selectedTags.length > 0
+  const hasActiveFilters =
+    query !== "" || newOnly || premiumOnly || selectedTags.length > 0
 
   return (
     <div
@@ -135,7 +152,16 @@ function ProjectsView({
                 onChange={() => setNewOnly((prev) => !prev)}
                 className="size-4 rounded border border-input accent-primary"
               />
-              <span>New only</span>
+              <span>New</span>
+            </label>
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={premiumOnly}
+                onChange={() => setPremiumOnly((prev) => !prev)}
+                className="size-4 rounded border border-input accent-primary"
+              />
+              <span>Premium</span>
             </label>
           </div>
 
@@ -186,17 +212,19 @@ function ProjectsView({
           </div>
           <Select
             value={sort}
-            onValueChange={(value) => setSort(value as "desc" | "asc")}
+            onValueChange={(value) => setSort(value as SortOption)}
           >
             <SelectTrigger
-              aria-label="Sort by date"
-              className="ml-auto w-[180px]"
+              aria-label="Sort projects"
+              className="ml-auto w-[200px]"
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="desc">Date: descending</SelectItem>
               <SelectItem value="asc">Date: ascending</SelectItem>
+              <SelectItem value="upvotes">Most upvoted</SelectItem>
+              <SelectItem value="impressions">Most viewed</SelectItem>
             </SelectContent>
           </Select>
         </div>

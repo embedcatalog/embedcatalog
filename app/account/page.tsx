@@ -31,6 +31,7 @@ type Project = {
   url: string
   status: "draft" | "pending" | "published" | "rejected"
   is_premium: boolean
+  impressions_count: number
   created_at: string
 }
 
@@ -59,7 +60,9 @@ function AccountPage() {
 
     supabase
       .from("projects")
-      .select("id, name, description, url, status, is_premium, created_at")
+      .select(
+        "id, name, description, url, status, is_premium, impressions_count, created_at"
+      )
       .eq("owner_id", user.id)
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
@@ -101,7 +104,7 @@ function AccountPage() {
     user.email
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="site-container py-8 sm:py-12">
       <div className="grid gap-8 md:grid-cols-[13rem_minmax(0,1fr)]">
         <aside className="flex flex-col border-b pb-6 md:min-h-[28rem] md:border-r md:border-b-0 md:pr-6 md:pb-0">
           <p className="px-3 text-sm font-medium">Account</p>
@@ -235,6 +238,10 @@ function AccountPage() {
                             </p>
                             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                               {project.description}
+                            </p>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              {project.impressions_count.toLocaleString()}{" "}
+                              impressions
                             </p>
                           </div>
                           <span className="flex shrink-0 items-center gap-2">

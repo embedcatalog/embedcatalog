@@ -4,15 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import {
-  Check,
-  ChevronLeft,
-  Copy,
-  Loader2,
-  Plus,
-  Trash2,
-  X,
-} from "lucide-react"
+import { ChevronLeft, Loader2, Plus, Trash2, X } from "lucide-react"
 
 import { useAuth } from "components/auth-provider"
 import { Button } from "components/ui/button"
@@ -26,6 +18,7 @@ import {
 import { Input } from "components/ui/input"
 import { Label } from "components/ui/label"
 import { Textarea } from "components/ui/textarea"
+import { ProjectInfoMarkdown } from "components/project-info-markdown"
 import { supabase } from "lib/supabase/client"
 
 type Embed = {
@@ -40,19 +33,6 @@ const defaultEmbed = (id: number): Embed => ({
   title: "Built with EmbedCatalog",
   description: "A project worth checking out.",
 })
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>'"]/g, (character) => {
-    const entities: Record<string, string> = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "'": "&#39;",
-      '"': "&quot;",
-    }
-    return entities[character]
-  })
-}
 
 function EditProjectForm() {
   const router = useRouter()
@@ -70,7 +50,6 @@ function EditProjectForm() {
   const [youtubeUrl, setYoutubeUrl] = React.useState("")
   const [githubUrl, setGithubUrl] = React.useState("")
   const [embeds, setEmbeds] = React.useState<Embed[]>([defaultEmbed(1)])
-  const [copiedId, setCopiedId] = React.useState<number | null>(null)
   const [saveError, setSaveError] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [fetching, setFetching] = React.useState(true)
@@ -122,7 +101,7 @@ function EditProjectForm() {
       setProjectUrl(project.url)
       setTagsInput((project.tags ?? []).join(", "))
       setImages(project.images ?? [])
-      setInfoInput(JSON.stringify(project.info ?? [], null, 2))
+      setInfoInput(typeof project.info === "string" ? project.info : "")
       const socials = project.socials ?? {}
       setTwitterUrl(socials.twitter ?? "")
       setYoutubeUrl(socials.youtube ?? "")
@@ -173,7 +152,7 @@ function EditProjectForm() {
 
   if (fetchError) {
     return (
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <main className="site-container py-8 sm:py-12">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/account">
             <ChevronLeft className="size-4" />
@@ -189,7 +168,7 @@ function EditProjectForm() {
 
   if (status === "pending" && !isAdmin) {
     return (
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+      <main className="site-container py-8 sm:py-12">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/account">
             <ChevronLeft className="size-4" />
@@ -213,22 +192,6 @@ function EditProjectForm() {
     )
   }
 
-  function embedCode(embed: Embed) {
-    const colors = {
-      background: "#ffffff",
-      border: "#d4d4d4",
-      text: "#171717",
-      muted: "#737373",
-    }
-    return `<a href="${escapeHtml(projectUrl)}" target="_blank" rel="noreferrer noopener" style="display:inline-block;color:${colors.text};text-decoration:none"><span style="display:block;max-width:320px;border:1px solid ${colors.border};border-radius:4px;background:${colors.background};padding:14px 16px;font-family:Arial,sans-serif"><strong style="display:block;font-size:14px;line-height:20px">${escapeHtml(embed.title)}</strong><span style="display:block;margin-top:4px;color:${colors.muted};font-size:12px;line-height:18px">${escapeHtml(embed.description)}</span></span></a>`
-  }
-
-  async function copyEmbed(embed: Embed) {
-    await navigator.clipboard.writeText(embedCode(embed))
-    setCopiedId(embed.id)
-    window.setTimeout(() => setCopiedId(null), 2000)
-  }
-
   async function saveProject() {
     const name = title.trim()
     const description = shortDescription.trim()
@@ -241,15 +204,6 @@ function EditProjectForm() {
     if (twitterUrl.trim()) socials.twitter = twitterUrl.trim()
     if (youtubeUrl.trim()) socials.youtube = youtubeUrl.trim()
     if (githubUrl.trim()) socials.github = githubUrl.trim()
-    let info: unknown
-
-    try {
-      info = JSON.parse(infoInput || "[]")
-    } catch {
-      setSaveError("Info must contain valid JSON.")
-      return
-    }
-
     if (!name || !description || !url) {
       setSaveError("Enter a title, short description, and valid URL.")
       return
@@ -298,7 +252,7 @@ function EditProjectForm() {
         images: [...images, ...uploadedImages].length
           ? [...images, ...uploadedImages]
           : null,
-        info,
+        info: infoInput.trim() || null,
       })
       .eq("id", projectId as string)
 
@@ -350,7 +304,7 @@ function EditProjectForm() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+    <main className="site-container py-8 sm:py-12">
       <div className="mb-8">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/account">
@@ -484,19 +438,40 @@ function EditProjectForm() {
           {isAdmin && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Info JSON</CardTitle>
+                <CardTitle className="text-lg">
+                  Project info (Markdown)
+                </CardTitle>
                 <CardDescription>
-                  JSON content blocks shown on the public project page.
+                  Write Markdown. Tables, task lists, code blocks, links, and
+                  images are supported.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Textarea
-                  aria-label="Project info JSON"
-                  value={infoInput}
-                  onChange={(event) => setInfoInput(event.target.value)}
-                  placeholder='[{"type":"text","content":"Project details"}]'
-                  className="min-h-64 font-mono text-xs"
-                />
+              <CardContent className="flex flex-col gap-5">
+                <div className="grid content-start gap-2">
+                  <Label htmlFor="project-info-markdown">Markdown</Label>
+                  <Textarea
+                    id="project-info-markdown"
+                    aria-label="Project info Markdown"
+                    value={infoInput}
+                    onChange={(event) => setInfoInput(event.target.value)}
+                    placeholder={
+                      "## Example\n\nDescribe your project with **Markdown**."
+                    }
+                    className="min-h-80 resize-y font-mono text-sm leading-relaxed"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="mb-2 text-sm font-medium">Preview</p>
+                  <div className="min-h-80 overflow-x-auto rounded-md border p-4">
+                    {infoInput.trim() ? (
+                      <ProjectInfoMarkdown content={infoInput} />
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Markdown preview will appear here.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -661,36 +636,6 @@ function EditProjectForm() {
                 {saving && <Loader2 className="size-4 animate-spin" />}
                 {saving ? "Saving" : "Save changes"}
               </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Embed code</CardTitle>
-              <CardDescription>
-                Copy the code for each variation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              {embeds.map((embed, index) => (
-                <div key={embed.id} className="flex flex-col gap-2">
-                  <p className="text-sm font-medium">Embed {index + 1}</p>
-                  <code className="max-h-28 overflow-auto rounded-md border bg-muted px-3 py-2 text-xs leading-relaxed break-all">
-                    {embedCode(embed)}
-                  </code>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => void copyEmbed(embed)}
-                  >
-                    {copiedId === embed.id ? (
-                      <Check className="size-4" />
-                    ) : (
-                      <Copy className="size-4" />
-                    )}
-                    {copiedId === embed.id ? "Copied" : "Copy code"}
-                  </Button>
-                </div>
-              ))}
             </CardContent>
           </Card>
         </aside>

@@ -1,16 +1,17 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
 import { Embed } from "components/ui/embed"
 import { Button } from "components/ui/button"
-import { CopyBlock } from "components/copy-block"
 import { CopyLinkButton } from "components/copy-link-button"
 import { ImageCarousel } from "components/image-carousel"
+import { ProjectInfoMarkdown } from "components/project-info-markdown"
 import { ProjectEmbeds, type CustomEmbed } from "components/project-embeds"
 import { ProjectGithubStats } from "components/project-github-stats"
+import { ProjectImpressionTracker } from "components/project-impression-tracker"
+import { ProjectUpvote } from "components/project-upvote"
 import { type Project } from "components/projects-grid"
 import { formatDate } from "lib/utils"
 
@@ -46,159 +47,124 @@ function ProjectDetail({
   customEmbeds: CustomEmbed[]
 }) {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        Back to projects
-      </Link>
+    <main className="site-container py-10">
+      <div className="mx-auto w-full max-w-3xl">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Back to projects
+        </Link>
 
-      <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex flex-col gap-2">
-            {(project.premium || project.isNew) && (
-              <div className="mb-1 flex items-center gap-2">
-                {project.premium && <Embed variant="secondary">Premium</Embed>}
-                {project.isNew && <Embed>New</Embed>}
+        <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="flex flex-col gap-2">
+              {(project.premium || project.isNew) && (
+                <div className="mb-1 flex items-center gap-2">
+                  {project.premium && (
+                    <Embed variant="secondary">Premium</Embed>
+                  )}
+                  {project.isNew && <Embed>New</Embed>}
+                </div>
+              )}
+              <h1 className="text-2xl font-semibold">{project.name}</h1>
+            </div>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p className="text-sm text-muted-foreground">
+                Added {formatDate(project.createdAt)}
+              </p>
+              <ProjectImpressionTracker
+                projectId={project.id}
+                initialCount={project.impressionsCount}
+              />
+              <ProjectUpvote
+                projectId={project.id}
+                initialCount={project.upvotesCount}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {project.socials && (
+              <div className="flex items-center gap-0.5">
+                {project.socials.twitter && (
+                  <a
+                    href={project.socials.twitter}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={`${project.name} on X`}
+                    className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <TwitterIcon className="size-4" />
+                  </a>
+                )}
+                {project.socials.youtube && (
+                  <a
+                    href={project.socials.youtube}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={`${project.name} on YouTube`}
+                    className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <YoutubeIcon className="size-4" />
+                  </a>
+                )}
+                {project.socials.github && (
+                  <a
+                    href={project.socials.github}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={`${project.name} on GitHub`}
+                    className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <GithubIcon className="size-4" />
+                  </a>
+                )}
               </div>
             )}
-            <h1 className="text-2xl font-semibold">{project.name}</h1>
+            <CopyLinkButton path={`/projects/${project.slug}`} />
+            <Button asChild>
+              <a href={project.url} target="_blank" rel="noreferrer noopener">
+                Link
+              </a>
+            </Button>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Added {formatDate(project.createdAt)}
-          </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {project.socials && (
-            <div className="flex items-center gap-0.5">
-              {project.socials.twitter && (
-                <a
-                  href={project.socials.twitter}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={`${project.name} on X`}
-                  className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                >
-                  <TwitterIcon className="size-4" />
-                </a>
-              )}
-              {project.socials.youtube && (
-                <a
-                  href={project.socials.youtube}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={`${project.name} on YouTube`}
-                  className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                >
-                  <YoutubeIcon className="size-4" />
-                </a>
-              )}
-              {project.socials.github && (
-                <a
-                  href={project.socials.github}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={`${project.name} on GitHub`}
-                  className="flex size-9 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                >
-                  <GithubIcon className="size-4" />
-                </a>
-              )}
-            </div>
-          )}
-          <CopyLinkButton path={`/projects/${project.slug}`} />
-          <Button asChild>
-            <a href={project.url} target="_blank" rel="noreferrer noopener">
-              Link
-            </a>
-          </Button>
+        {project.githubUrl && (
+          <ProjectGithubStats
+            key={project.id}
+            projectId={project.id}
+            githubUrl={project.githubUrl}
+            initialStats={project.githubStats}
+          />
+        )}
+        <div className="mt-6">
+          <ImageCarousel images={project.images} alt={project.name} />
         </div>
-      </div>
-
-      {project.githubUrl && (
-        <ProjectGithubStats
-          key={project.id}
-          projectId={project.id}
-          githubUrl={project.githubUrl}
-          initialStats={project.githubStats}
+        <ProjectEmbeds
+          slug={project.slug}
+          projectName={project.name}
+          externalUrl={project.url}
+          isPremium={project.premium ?? false}
+          customEmbeds={customEmbeds}
         />
-      )}
-      <div className="mt-6">
-        <ImageCarousel images={project.images} alt={project.name} />
-      </div>
-      <ProjectEmbeds
-        slug={project.slug}
-        projectName={project.name}
-        externalUrl={project.url}
-        isPremium={project.premium ?? false}
-        customEmbeds={customEmbeds}
-      />
-      <p className="mt-6 leading-relaxed">{project.description}</p>
+        <p className="mt-6 leading-relaxed">{project.description}</p>
 
-      {project.info && project.info.length > 0 && (
-        <div className="mt-8 flex flex-col gap-6">
-          {project.info.map((block, index) => {
-            if (block.type === "heading")
-              return (
-                <h2
-                  key={index}
-                  className="text-xl font-semibold tracking-tight"
-                >
-                  {block.content}
-                </h2>
-              )
-            if (block.type === "text")
-              return (
-                <p key={index} className="leading-relaxed">
-                  {block.content}
-                </p>
-              )
-            if (block.type === "code")
-              return <CopyBlock key={index} code={block.content ?? ""} />
-            if (block.type === "list")
-              return (
-                <ul
-                  key={index}
-                  className="flex list-disc flex-col gap-2 pl-5 leading-relaxed"
-                >
-                  {(block.items ?? []).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )
-            return (
-              <div
-                key={index}
-                className="w-full overflow-hidden rounded-xl border bg-muted"
-              >
-                <Image
-                  src={block.content ?? ""}
-                  alt={project.name}
-                  width={1200}
-                  height={800}
-                  unoptimized
-                  sizes="(min-width: 768px) 768px, 100vw"
-                  className="h-auto w-full"
-                />
-              </div>
-            )
-          })}
-        </div>
-      )}
+        <ProjectInfoMarkdown content={project.info} />
 
-      <div className="mt-6">
-        <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-          Tags
-        </h2>
-        <div className="flex flex-wrap gap-1.5">
-          {project.tags.map((tag) => (
-            <Embed key={tag} variant="outline">
-              {tag}
-            </Embed>
-          ))}
+        <div className="mt-6">
+          <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Tags
+          </h2>
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.map((tag) => (
+              <Embed key={tag} variant="outline">
+                {tag}
+              </Embed>
+            ))}
+          </div>
         </div>
       </div>
     </main>

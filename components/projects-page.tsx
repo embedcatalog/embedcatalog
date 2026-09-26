@@ -87,6 +87,8 @@ function mapProject(project: {
   socials: Record<string, string> | null
   info: unknown
   is_premium: boolean
+  impressions_count: number
+  upvotes_count: number
   created_at: string
 }): Project {
   return {
@@ -110,7 +112,9 @@ function mapProject(project: {
     images: (project.images ?? []).map(getProjectImageUrl),
     tags: project.tags ?? [],
     createdAt: project.created_at,
-    info: (project.info as Project["info"]) ?? undefined,
+    impressionsCount: project.impressions_count,
+    upvotesCount: project.upvotes_count,
+    info: typeof project.info === "string" ? project.info : undefined,
     socials: project.socials ?? undefined,
   }
 }
@@ -125,7 +129,7 @@ function ProjectsPage() {
     supabase
       .from("projects")
       .select(
-        "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, created_at"
+        "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
       )
       .eq("status", "published")
       .order("created_at", { ascending: false })

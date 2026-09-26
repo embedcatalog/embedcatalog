@@ -37,7 +37,7 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="site-container flex h-14 items-center justify-between gap-4">
         <Link
           href="/"
           className="flex items-center font-semibold"
@@ -90,7 +90,7 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
       </div>
 
       <div className={cn("border-t md:hidden", open ? "block" : "hidden")}>
-        <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3 sm:px-6">
+        <nav className="site-container flex flex-col gap-1 py-3">
           {navLinks.map((link) => (
             <Link
               key={link.label}

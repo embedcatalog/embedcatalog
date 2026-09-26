@@ -146,7 +146,7 @@ function AdminPage() {
   const others = projects.filter((project) => project.status !== "pending")
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <main className="site-container py-8 sm:py-12">
       <Button variant="ghost" size="sm" asChild>
         <Link href="/account">
           <ChevronLeft className="size-4" />

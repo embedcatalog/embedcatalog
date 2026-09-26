@@ -33,4 +33,4 @@ jobs:
         run: npm ci
 
       - name: Sync project statistics
-        run: node scripts/sync-github-stats.mjs
+        run: npx jiti scripts/sync-github-stats.ts

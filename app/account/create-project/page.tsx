@@ -2,13 +2,14 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { Check, ChevronLeft, Copy, Loader2, Plus, Trash2 } from "lucide-react"
+import { ChevronLeft, Loader2, Plus, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { useAuth } from "components/auth-provider"
 import { Button } from "components/ui/button"
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -17,36 +18,94 @@ import {
 import { Input } from "components/ui/input"
 import { Label } from "components/ui/label"
 import { Textarea } from "components/ui/textarea"
+import { ProjectInfoMarkdown } from "components/project-info-markdown"
 import { supabase } from "lib/supabase/client"
+import { cn } from "lib/utils"
+
+type Theme = "light" | "dark"
 
 type Embed = {
   id: number
   title: string
   description: string
+  theme: Theme
 }
 
 const defaultEmbed = (id: number): Embed => ({
   id,
   title: "Built with EmbedCatalog",
   description: "A project worth checking out.",
+  theme: "light",
 })
 
-function escapeHtml(value: string) {
-  return value.replace(/[&<>'"]/g, (character) => {
-    const entities: Record<string, string> = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      "'": "&#39;",
-      '"': "&quot;",
-    }
-    return entities[character]
-  })
+function getEmbedColors(theme: Theme) {
+  return theme === "dark"
+    ? {
+        background: "#171717",
+        border: "#404040",
+        text: "#fafafa",
+        muted: "#a3a3a3",
+      }
+    : {
+        background: "#ffffff",
+        border: "#d4d4d4",
+        text: "#171717",
+        muted: "#737373",
+      }
+}
+
+function ThemeSwitch({
+  theme,
+  onThemeChange,
+}: {
+  theme: Theme
+  onThemeChange: (theme: Theme) => void
+}) {
+  const isDark = theme === "dark"
+
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={cn(
+          "text-xs",
+          !isDark ? "font-medium text-foreground" : "text-muted-foreground"
+        )}
+      >
+        Light
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isDark}
+        aria-label="Toggle embed theme"
+        onClick={() => onThemeChange(isDark ? "light" : "dark")}
+        className={cn(
+          "relative h-5 w-9 shrink-0 rounded-full border transition-colors",
+          isDark ? "border-foreground bg-foreground" : "border-border bg-muted"
+        )}
+      >
+        <span
+          className={cn(
+            "absolute top-0.5 left-0.5 size-4 rounded-full bg-background shadow-sm transition-transform",
+            isDark && "translate-x-4"
+          )}
+        />
+      </button>
+      <span
+        className={cn(
+          "text-xs",
+          isDark ? "font-medium text-foreground" : "text-muted-foreground"
+        )}
+      >
+        Dark
+      </span>
+    </div>
+  )
 }
 
 function CreateProjectPage() {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, loading, isAdmin } = useAuth()
   const [title, setTitle] = React.useState("")
   const [projectUrl, setProjectUrl] = React.useState("https://example.com")
   const [shortDescription, setShortDescription] = React.useState("")
@@ -54,8 +113,8 @@ function CreateProjectPage() {
   const [twitterUrl, setTwitterUrl] = React.useState("")
   const [youtubeUrl, setYoutubeUrl] = React.useState("")
   const [githubUrl, setGithubUrl] = React.useState("")
+  const [infoInput, setInfoInput] = React.useState("")
   const [embeds, setEmbeds] = React.useState<Embed[]>([])
-  const [copiedId, setCopiedId] = React.useState<number | null>(null)
   const [saveError, setSaveError] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
 
@@ -79,22 +138,6 @@ function CreateProjectPage() {
         embed.id === id ? { ...embed, ...changes } : embed
       )
     )
-  }
-
-  function embedCode(embed: Embed) {
-    const colors = {
-      background: "#ffffff",
-      border: "#d4d4d4",
-      text: "#171717",
-      muted: "#737373",
-    }
-    return `<a href="${escapeHtml(projectUrl)}" target="_blank" rel="noreferrer noopener" style="display:inline-block;color:${colors.text};text-decoration:none"><span style="display:block;max-width:320px;border:1px solid ${colors.border};border-radius:4px;background:${colors.background};padding:14px 16px;font-family:Arial,sans-serif"><strong style="display:block;font-size:14px;line-height:20px">${escapeHtml(embed.title)}</strong><span style="display:block;margin-top:4px;color:${colors.muted};font-size:12px;line-height:18px">${escapeHtml(embed.description)}</span></span></a>`
-  }
-
-  async function copyEmbed(embed: Embed) {
-    await navigator.clipboard.writeText(embedCode(embed))
-    setCopiedId(embed.id)
-    window.setTimeout(() => setCopiedId(null), 2000)
   }
 
   async function saveProject() {
@@ -141,6 +184,7 @@ function CreateProjectPage() {
         github_url: socials.github ?? null,
         tags: tags.length ? tags : null,
         socials: Object.keys(socials).length ? socials : null,
+        info: isAdmin && infoInput.trim() ? infoInput.trim() : null,
       })
       .select("id")
       .single()
@@ -181,7 +225,7 @@ function CreateProjectPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+    <main className="site-container py-8 sm:py-12">
       <div className="mb-8">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/account">
@@ -252,6 +296,47 @@ function CreateProjectPage() {
             </CardContent>
           </Card>
 
+          {isAdmin && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Project info (Markdown)
+                </CardTitle>
+                <CardDescription>
+                  Write Markdown. Tables, task lists, code blocks, links, and
+                  images are supported.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-5">
+                <div className="grid gap-2">
+                  <Label htmlFor="project-info-markdown">Markdown</Label>
+                  <Textarea
+                    id="project-info-markdown"
+                    aria-label="Project info Markdown"
+                    value={infoInput}
+                    onChange={(event) => setInfoInput(event.target.value)}
+                    placeholder={
+                      "## Example\n\nDescribe your project with **Markdown**."
+                    }
+                    className="min-h-80 resize-y font-mono text-sm leading-relaxed"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="mb-2 text-sm font-medium">Preview</p>
+                  <div className="min-h-80 overflow-x-auto rounded-md border p-4">
+                    {infoInput.trim() ? (
+                      <ProjectInfoMarkdown content={infoInput} />
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Markdown preview will appear here.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Socials</CardTitle>
@@ -316,29 +401,32 @@ function CreateProjectPage() {
             </p>
           )}
           {embeds.map((embed, index) => {
-            const colors = {
-              background: "#ffffff",
-              border: "#d4d4d4",
-              text: "#171717",
-              muted: "#737373",
-            }
+            const colors = getEmbedColors(embed.theme)
             return (
               <Card key={embed.id}>
                 <CardHeader>
                   <CardTitle className="text-lg">Embed {index + 1}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive"
-                    aria-label={`Remove embed ${index + 1}`}
-                    onClick={() =>
-                      setEmbeds((current) =>
-                        current.filter((item) => item.id !== embed.id)
-                      )
-                    }
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
+                  <CardAction className="flex items-center gap-2">
+                    <ThemeSwitch
+                      theme={embed.theme}
+                      onThemeChange={(theme) =>
+                        updateEmbed(embed.id, { theme })
+                      }
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive"
+                      aria-label={`Remove embed ${index + 1}`}
+                      onClick={() =>
+                        setEmbeds((current) =>
+                          current.filter((item) => item.id !== embed.id)
+                        )
+                      }
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </CardAction>
                 </CardHeader>
                 <CardContent className="grid gap-5">
                   <div className="grid gap-2">
@@ -415,42 +503,6 @@ function CreateProjectPage() {
                 {saving && <Loader2 className="size-4 animate-spin" />}
                 {saving ? "Saving" : "Save project"}
               </Button>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Embed code</CardTitle>
-              <CardDescription>
-                Copy the code for each variation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              {embeds.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No embeds added yet.
-                </p>
-              ) : (
-                embeds.map((embed, index) => (
-                  <div key={embed.id} className="flex flex-col gap-2">
-                    <p className="text-sm font-medium">Embed {index + 1}</p>
-                    <code className="max-h-28 overflow-auto rounded-md border bg-muted px-3 py-2 text-xs leading-relaxed break-all">
-                      {embedCode(embed)}
-                    </code>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => void copyEmbed(embed)}
-                    >
-                      {copiedId === embed.id ? (
-                        <Check className="size-4" />
-                      ) : (
-                        <Copy className="size-4" />
-                      )}
-                      {copiedId === embed.id ? "Copied" : "Copy code"}
-                    </Button>
-                  </div>
-                ))
-              )}
             </CardContent>
           </Card>
         </aside>

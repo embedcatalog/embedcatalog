@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 
+import type { Database } from "../lib/supabase/database"
+
 const supabaseUrl = process.env.SUPABASE_URL
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const githubToken = process.env.GITHUB_TOKEN
@@ -10,11 +12,23 @@ if (!supabaseUrl || !serviceRoleKey || !githubToken) {
   )
 }
 
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
+const supabase = createClient<Database>(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 })
 
-function parseGithubRepo(url) {
+type GithubProject = {
+  id: string
+  github_url: string | null
+  socials: Record<string, string> | null
+}
+
+type GithubRepository = {
+  stargazers_count: number
+  forks_count: number
+  license: { spdx_id: string | null } | null
+}
+
+function parseGithubRepo(url: string): string | null {
   try {
     const parsed = new URL(url)
     if (
@@ -32,8 +46,11 @@ function parseGithubRepo(url) {
   }
 }
 
-function parseContributorCount(linkHeader, list) {
-  if (!linkHeader) return list.length
+function parseContributorCount(
+  linkHeader: string | null,
+  contributors: unknown[]
+): number {
+  if (!linkHeader) return contributors.length
 
   const lastLink = linkHeader
     .split(",")
@@ -41,10 +58,10 @@ function parseContributorCount(linkHeader, list) {
     .find((part) => part.includes('rel="last"'))
   const page = lastLink?.match(/[?&]page=(\d+)/)?.[1]
 
-  return page ? Number(page) : list.length
+  return page ? Number(page) : contributors.length
 }
 
-async function githubRequest(path) {
+async function githubRequest(path: string): Promise<Response> {
   const response = await fetch(`https://api.github.com${path}`, {
     headers: {
       Accept: "application/vnd.github+json",
@@ -61,8 +78,8 @@ async function githubRequest(path) {
   return response
 }
 
-async function loadProjects() {
-  const projects = []
+async function loadProjects(): Promise<GithubProject[]> {
+  const projects: GithubProject[] = []
   const pageSize = 1000
 
   for (let offset = 0; ; offset += pageSize) {
@@ -73,8 +90,9 @@ async function loadProjects() {
       .order("id")
       .range(offset, offset + pageSize - 1)
 
-    if (error)
+    if (error) {
       throw new Error(`Supabase project query failed: ${error.message}`)
+    }
 
     projects.push(...data)
     if (data.length < pageSize) return projects
@@ -82,7 +100,7 @@ async function loadProjects() {
 }
 
 const projects = await loadProjects()
-const projectsByRepo = new Map()
+const projectsByRepo = new Map<string, GithubProject[]>()
 
 for (const project of projects) {
   const repo = parseGithubRepo(
@@ -101,8 +119,8 @@ let failed = 0
 for (const [repo, repoProjects] of projectsByRepo) {
   try {
     const repoResponse = await githubRequest(`/repos/${repo}`)
-    const repoData = await repoResponse.json()
-    const update = {
+    const repoData = (await repoResponse.json()) as GithubRepository
+    const update: Database["public"]["Tables"]["projects"]["Update"] = {
       github_stars: repoData.stargazers_count,
       github_forks: repoData.forks_count,
       github_license:
@@ -125,7 +143,7 @@ for (const [repo, repoProjects] of projectsByRepo) {
       )
 
       if (contributorsResponse.ok) {
-        const contributors = await contributorsResponse.json()
+        const contributors = (await contributorsResponse.json()) as unknown[]
         update.github_contributors = parseContributorCount(
           contributorsResponse.headers.get("Link"),
           contributors

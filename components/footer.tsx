@@ -49,14 +49,18 @@ const socialLinks = [
     href: "https://github.com/EmbedCatalog/embedcatalog",
     icon: GithubIcon,
   },
-  { label: "Email", href: "mailto:aanthonymaxgithub@gmail.com", icon: MailIcon },
+  {
+    label: "Email",
+    href: "mailto:aanthonymaxgithub@gmail.com",
+    icon: MailIcon,
+  },
   { label: "X", href: "https://x.com/aanthonymax", icon: XIcon },
 ]
 
 function Footer() {
   return (
     <footer className="border-t bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <div className="site-container py-12">
         <div className="flex flex-col gap-8 sm:flex-row">
           <div>
             <Link href="/" className="flex items-center font-semibold">

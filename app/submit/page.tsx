@@ -157,202 +157,207 @@ const offerings: Offering[] = [
 
 export default function SubmitPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <div className="flex flex-col items-center text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Submit a project
-        </h1>
-        <p className="mt-3 max-w-md text-muted-foreground">
-          Pick a plan and reach out by email or on X to get your project listed.
-        </p>
-      </div>
-
-      <div className="mt-10 grid gap-4 sm:grid-cols-2">
-        {plans.map((plan) => (
-          <div
-            key={plan.name}
-            className={cn(
-              "flex flex-col rounded-xl border p-6",
-              plan.highlighted &&
-                "border-foreground/30 ring-1 ring-foreground/10"
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {plan.highlighted && (
-                  <span className="flex size-9 items-center justify-center rounded-lg border text-primary">
-                    <PaypalIcon className="size-4" />
-                  </span>
-                )}
-                <h2 className="font-medium">{plan.name}</h2>
-              </div>
-            </div>
-            <div className="mt-4 flex items-baseline gap-1.5">
-              <span className="text-4xl font-semibold tracking-tight">
-                {plan.price}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {plan.period}
-              </span>
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {plan.description}
-            </p>
-            <ul className="mt-6 flex flex-col gap-3">
-              {plan.features.map((feature) => (
-                <li key={feature} className="flex items-start gap-2 text-sm">
-                  <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-            <Button
-              asChild
-              className="mt-6"
-              variant={plan.highlighted ? "default" : "outline"}
-            >
-              <a href="#get-started">Get started</a>
-            </Button>
-          </div>
-        ))}
-      </div>
-
-      <section className="mt-16">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            What we offer
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Everything you need to get your project in front of people.
+    <main className="site-container py-16">
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="flex flex-col items-center text-center">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Submit a project
+          </h1>
+          <p className="mt-3 max-w-md text-muted-foreground">
+            Pick a plan and reach out by email or on X to get your project
+            listed.
           </p>
         </div>
-        <ul className="mt-8 divide-y rounded-xl border">
-          {offerings.map((offer) => (
-            <li
-              key={offer.title}
-              className="flex flex-wrap items-center gap-x-3 gap-y-1 p-4"
-            >
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border text-primary">
-                <offer.icon className="size-4" />
-              </span>
-              <span className="font-medium">{offer.title}</span>
-              <span className="min-w-0 flex-1 text-sm text-muted-foreground">
-                {offer.description}
-              </span>
-              {offer.links && (
-                <span className="flex w-full flex-wrap gap-x-4 gap-y-1 pl-12 sm:w-auto sm:pl-0">
-                  {offer.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="group inline-flex items-center gap-1 text-xs font-medium text-foreground underline-offset-4 hover:underline"
-                    >
-                      <ArrowUpRight className="size-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
-                      {link.label}
-                    </a>
-                  ))}
-                </span>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2">
+          {plans.map((plan) => (
+            <div
+              key={plan.name}
+              className={cn(
+                "flex flex-col rounded-xl border p-6",
+                plan.highlighted &&
+                  "border-foreground/30 ring-1 ring-foreground/10"
               )}
-            </li>
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {plan.highlighted && (
+                    <span className="flex size-9 items-center justify-center rounded-lg border text-primary">
+                      <PaypalIcon className="size-4" />
+                    </span>
+                  )}
+                  <h2 className="font-medium">{plan.name}</h2>
+                </div>
+              </div>
+              <div className="mt-4 flex items-baseline gap-1.5">
+                <span className="text-4xl font-semibold tracking-tight">
+                  {plan.price}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {plan.period}
+                </span>
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {plan.description}
+              </p>
+              <ul className="mt-6 flex flex-col gap-3">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2 text-sm">
+                    <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button
+                asChild
+                className="mt-6"
+                variant={plan.highlighted ? "default" : "outline"}
+              >
+                <a href="#get-started">Get started</a>
+              </Button>
+            </div>
           ))}
-        </ul>
-      </section>
-
-      <div className="mt-8 rounded-xl border p-5">
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-medium">Paid projects added</span>
-          <span className="text-muted-foreground tabular-nums">0 of 15</span>
         </div>
-        <div
-          className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
-          role="progressbar"
-          aria-valuenow={0}
-          aria-valuemin={0}
-          aria-valuemax={15}
-        >
+
+        <section className="mt-16">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              What we offer
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Everything you need to get your project in front of people.
+            </p>
+          </div>
+          <ul className="mt-8 divide-y rounded-xl border">
+            {offerings.map((offer) => (
+              <li
+                key={offer.title}
+                className="flex flex-wrap items-center gap-x-3 gap-y-1 p-4"
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border text-primary">
+                  <offer.icon className="size-4" />
+                </span>
+                <span className="font-medium">{offer.title}</span>
+                <span className="min-w-0 flex-1 text-sm text-muted-foreground">
+                  {offer.description}
+                </span>
+                {offer.links && (
+                  <span className="flex w-full flex-wrap gap-x-4 gap-y-1 pl-12 sm:w-auto sm:pl-0">
+                    {offer.links.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="group inline-flex items-center gap-1 text-xs font-medium text-foreground underline-offset-4 hover:underline"
+                      >
+                        <ArrowUpRight className="size-3.5 text-muted-foreground transition-colors group-hover:text-foreground" />
+                        {link.label}
+                      </a>
+                    ))}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <div className="mt-8 rounded-xl border p-5">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-medium">Paid projects added</span>
+            <span className="text-muted-foreground tabular-nums">0 of 15</span>
+          </div>
           <div
-            className="h-full rounded-full bg-primary transition-all"
-            style={{ width: "0%" }}
-          />
+            className="mt-3 h-2 w-full overflow-hidden rounded-full bg-muted"
+            role="progressbar"
+            aria-valuenow={0}
+            aria-valuemin={0}
+            aria-valuemax={15}
+          >
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: "0%" }}
+            />
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            In September 2026, due to the volume of work, we&rsquo;ll be able to
+            add the first fifteen paid projects.
+          </p>
         </div>
-        <p className="mt-3 text-sm text-muted-foreground">
-          In September 2026, due to the volume of work, we&rsquo;ll be able to
-          add the first fifteen paid projects.
-        </p>
-      </div>
 
-      <div id="get-started" className="mt-8 scroll-mt-20">
-        <SubmitProjectPanel />
-        <p className="mt-3 text-sm text-muted-foreground">
-          Want premium? Email us at{" "}
+        <div id="get-started" className="mt-8 scroll-mt-20">
+          <SubmitProjectPanel />
+          <p className="mt-3 text-sm text-muted-foreground">
+            Want premium? Email us at{" "}
+            <a
+              href={`mailto:${EMAIL}`}
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              {EMAIL}
+            </a>{" "}
+            or DM us on{" "}
+            <a
+              href={TWITTER_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              X (Twitter)
+            </a>
+            .
+          </p>
+        </div>
+
+        <div id="contact" className="mt-10 flex scroll-mt-20 flex-col gap-3">
+          <p className="text-sm text-muted-foreground">
+            Prefer to reach out directly? Contact us by email or on X.
+          </p>
           <a
             href={`mailto:${EMAIL}`}
-            className="font-medium text-foreground underline underline-offset-4"
+            className="flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-accent"
           >
-            {EMAIL}
-          </a>{" "}
-          or DM us on{" "}
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border text-muted-foreground">
+              <MailIcon className="size-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-medium">Email</span>
+              <span className="block truncate text-sm text-muted-foreground">
+                {EMAIL}
+              </span>
+            </span>
+          </a>
+
           <a
             href={TWITTER_URL}
             target="_blank"
             rel="noreferrer noopener"
+            className="flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-accent"
+          >
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border text-muted-foreground">
+              <XIcon className="size-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-medium">
+                DM on X (Twitter)
+              </span>
+              <span className="block truncate text-sm text-muted-foreground">
+                @{TWITTER_HANDLE}
+              </span>
+            </span>
+          </a>
+        </div>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          By submitting, you agree to the{" "}
+          <Link
+            href="/submission-terms"
             className="font-medium text-foreground underline underline-offset-4"
           >
-            X (Twitter)
-          </a>
+            Project Submission Terms
+          </Link>
           .
         </p>
       </div>
-
-      <div id="contact" className="mt-10 flex scroll-mt-20 flex-col gap-3">
-        <p className="text-sm text-muted-foreground">
-          Prefer to reach out directly? Contact us by email or on X.
-        </p>
-        <a
-          href={`mailto:${EMAIL}`}
-          className="flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-accent"
-        >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border text-muted-foreground">
-            <MailIcon className="size-5" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-sm font-medium">Email</span>
-            <span className="block truncate text-sm text-muted-foreground">
-              {EMAIL}
-            </span>
-          </span>
-        </a>
-
-        <a
-          href={TWITTER_URL}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="flex items-center gap-4 rounded-xl border p-4 transition-colors hover:bg-accent"
-        >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border text-muted-foreground">
-            <XIcon className="size-5" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-sm font-medium">DM on X (Twitter)</span>
-            <span className="block truncate text-sm text-muted-foreground">
-              @{TWITTER_HANDLE}
-            </span>
-          </span>
-        </a>
-      </div>
-
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        By submitting, you agree to the{" "}
-        <Link
-          href="/submission-terms"
-          className="font-medium text-foreground underline underline-offset-4"
-        >
-          Project Submission Terms
-        </Link>
-        .
-      </p>
     </main>
   )
 }

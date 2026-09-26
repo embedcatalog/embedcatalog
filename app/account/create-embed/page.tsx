@@ -81,7 +81,7 @@ function CreateEmbedPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+    <main className="site-container py-8 sm:py-12">
       <div className="mb-8">
         <Button variant="ghost" size="sm" asChild>
           <Link href="/account">

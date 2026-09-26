@@ -3,6 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { ArrowUp, Eye } from "lucide-react"
 
 import { Embed } from "components/ui/embed"
 import {
@@ -41,12 +42,6 @@ function GithubIcon(props: React.ComponentProps<"svg">) {
   )
 }
 
-export type ProjectInfoBlock = {
-  type: "heading" | "text" | "code" | "image" | "list"
-  content?: string
-  items?: string[]
-}
-
 export type ProjectSocials = {
   twitter?: string
   youtube?: string
@@ -74,7 +69,9 @@ export type Project = {
   images: string[]
   tags: string[]
   createdAt: string
-  info?: ProjectInfoBlock[]
+  impressionsCount: number
+  upvotesCount: number
+  info?: string
   socials?: ProjectSocials
 }
 
@@ -94,7 +91,7 @@ function ProjectsGrid({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,24rem),1fr))] gap-4">
       {projects.map((project) => (
         <Card
           key={project.id}
@@ -159,7 +156,19 @@ function ProjectsGrid({
             </div>
           </CardContent>
           <CardFooter className="mt-auto justify-between text-xs text-muted-foreground">
-            <span>Added {formatDate(project.createdAt)}</span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span className="whitespace-nowrap">
+                {formatDate(project.createdAt)}
+              </span>
+              <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                <Eye className="size-3.5" />
+                {project.impressionsCount.toLocaleString("en-US")}
+              </span>
+              <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                <ArrowUp className="size-3.5" />
+                {project.upvotesCount.toLocaleString("en-US")}
+              </span>
+            </div>
             <div className="relative z-10 flex items-center gap-0.5">
               {project.githubUrl && (
                 <ProjectCardStars
