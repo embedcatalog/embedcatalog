@@ -1,26 +1,18 @@
 <div align="center">
-  <a href="https://embedcatalog.com">
-    <img width="120" src="https://github.com/EmbedCatalog/embedcatalog/raw/main/public/images/logo.png" alt="EmbedCatalog" title="EmbedCatalog" />
-  </a>
+
+  [![EmbedCatalog](public/images/photo1.png)](https://embedcatalog.com)
 
   <h1>EmbedCatalog</h1>
 
-  <p>A free project catalog — list your project and get unique, practical embed badges for it.</p>
-
   <p>
-    <a href="https://github.com/EmbedCatalog/embedcatalog/blob/main/LICENSE"><img src="https://embedcatalog.com/embed/hmpl/license.png" alt="license" /></a>
-    <a href="https://embedcatalog.com"><img src="https://embedcatalog.com/embed/hmpl/added.theme-dark.png" alt="embedcatalog" /></a>
-    <a href="https://x.com/aanthonymax"><img src="https://img.shields.io/badge/twitter-000?logo=x&logoColor=fff" alt="x.com" /></a>
+    <a href="https://github.com/EmbedCatalog/embedcatalog/blob/main/LICENSE"><img height="20" src="https://embedcatalog.com/embed/hmpl/license.png" alt="license" /></a>
+    <a href="https://embedcatalog.com"><img height="20" src="https://embedcatalog.com/embed/hmpl/added.theme-dark.png" alt="embedcatalog" /></a>
+    <a href="https://x.com/aanthonymax"><img height="20" src="https://img.shields.io/badge/twitter-000?logo=x&logoColor=fff" alt="x.com" /></a>
   </p>
+  <p>Project catalog where you can add yours and get interesting and practical embeds.</p>
 </div>
 
-<!--
-  Insert a banner/demo image here, e.g.:
-  <p align="center">
-    <img src="./public/images/banner.png" alt="EmbedCatalog preview" width="900" />
-  </p>
-  A screenshot or short GIF of the homepage catalog (project cards + embeds) works best.
--->
+![EmbedCatalog interface](public/images/photo2.png)
 
 ## Table of contents
 
