@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Loader2 } from "lucide-react"
+import { usePathname, useSearchParams } from "next/navigation"
+import { Loader2, Search, X } from "lucide-react"
 
 import { CustomEmbedCard } from "components/project-embeds"
 import { Card, CardContent } from "components/ui/card"
+import { Input } from "components/ui/input"
 import { supabase } from "lib/supabase/client"
 
 type PublicEmbed = {
@@ -16,9 +18,30 @@ type PublicEmbed = {
   projectUrl: string
 }
 
-function EmbedsPage() {
+function EmbedsPageContent() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
   const [embeds, setEmbeds] = React.useState<PublicEmbed[]>([])
   const [loading, setLoading] = React.useState(true)
+  const [query, setQuery] = React.useState(() => searchParams.get("q") ?? "")
+
+  // Keep the URL shareable without triggering a Next.js navigation.
+  React.useEffect(() => {
+    const params = new URLSearchParams()
+    if (query) params.set("q", query)
+
+    const queryString = params.toString()
+    if (queryString === window.location.search.slice(1)) {
+      return
+    }
+
+    window.history.replaceState(
+      null,
+      "",
+      queryString ? `${pathname}?${queryString}` : pathname
+    )
+  }, [query, pathname])
 
   React.useEffect(() => {
     let cancelled = false
@@ -75,6 +98,17 @@ function EmbedsPage() {
     }
   }, [])
 
+  const filteredEmbeds = React.useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return embeds
+
+    return embeds.filter(
+      (embed) =>
+        embed.title.toLowerCase().includes(q) ||
+        embed.projectName.toLowerCase().includes(q)
+    )
+  }, [embeds, query])
+
   return (
     <main className="site-container py-10">
       <div className="mb-6">
@@ -82,13 +116,35 @@ function EmbedsPage() {
           Embeds{" "}
           {!loading && (
             <span className="font-normal text-muted-foreground">
-              ({embeds.length})
+              ({filteredEmbeds.length})
             </span>
           )}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Custom embeds from projects in EmbedCatalog.
         </p>
+      </div>
+
+      <div className="mb-6 flex min-w-0 items-center gap-2">
+        <div className="relative max-w-sm min-w-0 flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search by title or project name..."
+            className="pl-9"
+          />
+          {query && (
+            <button
+              type="button"
+              aria-label="Clear search"
+              onClick={() => setQuery("")}
+              className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -101,9 +157,22 @@ function EmbedsPage() {
             No custom embeds yet.
           </CardContent>
         </Card>
+      ) : filteredEmbeds.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-center text-sm text-muted-foreground">
+            <p>No custom embeds match your search.</p>
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="text-xs text-primary underline underline-offset-4 hover:opacity-80"
+            >
+              Clear search
+            </button>
+          </CardContent>
+        </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
-          {embeds.map((embed) => (
+          {filteredEmbeds.map((embed) => (
             <div key={embed.id}>
               <CustomEmbedCard
                 slug={embed.projectSlug}
@@ -118,6 +187,22 @@ function EmbedsPage() {
         </div>
       )}
     </main>
+  )
+}
+
+function EmbedsPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <main className="site-container py-10">
+          <div className="flex min-h-64 items-center justify-center">
+            <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        </main>
+      }
+    >
+      <EmbedsPageContent />
+    </React.Suspense>
   )
 }
 
