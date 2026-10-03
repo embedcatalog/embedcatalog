@@ -320,11 +320,18 @@ function ProjectEmbeds({
     { title: "Organization", kind: "organization" as const, premium: true },
   ]
 
-  const tabs: { id: EmbedTab; label: string }[] = [
-    { id: "default", label: "Default embeds" },
-    { id: "premium", label: "Premium embeds" },
-    { id: "custom", label: "Custom embeds" },
-  ]
+  const tabs: { id: EmbedTab; label: string }[] =
+    customEmbeds.length > 0
+      ? [
+          { id: "custom", label: "Custom embeds" },
+          { id: "default", label: "Default embeds" },
+          { id: "premium", label: "Premium embeds" },
+        ]
+      : [
+          { id: "default", label: "Default embeds" },
+          { id: "premium", label: "Premium embeds" },
+          { id: "custom", label: "Custom embeds" },
+        ]
 
   return (
     <section className="mt-10">
