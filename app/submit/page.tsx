@@ -284,7 +284,7 @@ export default function SubmitPage() {
             />
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            In September 2026, due to the volume of work, we&rsquo;ll be able to
+            In October 2026, due to the volume of work, we&rsquo;ll be able to
             add the first fifteen paid projects.
           </p>
         </div>
