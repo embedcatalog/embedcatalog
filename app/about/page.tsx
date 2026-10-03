@@ -477,8 +477,16 @@ public         Static assets, logo, and preview images`}</code>
           <section>
             <h2 className="text-lg font-semibold">License</h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">
-              Source code released under the AGPL-3.0 license. The application
-              code is completely open source.
+              Source code released under the{" "}
+              <a
+                href="https://github.com/EmbedCatalog/embedcatalog/blob/main/LICENSE"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="font-medium text-foreground underline underline-offset-4"
+              >
+                AGPL-3.0 license
+              </a>
+              . The application code is completely open source.
             </p>
           </section>
 
