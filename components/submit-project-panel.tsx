@@ -96,7 +96,7 @@ function SubmitProjectPanel() {
 
   if (loading) {
     return (
-      <div className="flex justify-center rounded-xl border p-5">
+      <div className="flex justify-center rounded-xl border p-10">
         <Loader2 className="size-5 animate-spin text-muted-foreground" />
       </div>
     )
@@ -104,12 +104,12 @@ function SubmitProjectPanel() {
 
   if (!user) {
     return (
-      <div className="rounded-xl border p-5 text-center">
-        <p className="text-sm font-medium">Sign in to submit a project</p>
-        <p className="mt-1 text-sm text-muted-foreground">
+      <div className="rounded-xl border p-10 text-center">
+        <p className="text-lg font-semibold">Sign in to submit a project</p>
+        <p className="mt-2 text-muted-foreground">
           Create an account to add project details and send them for review.
         </p>
-        <Button asChild className="mt-4">
+        <Button asChild size="lg" className="mt-6">
           <Link href="/login">Sign in</Link>
         </Button>
       </div>
@@ -117,10 +117,10 @@ function SubmitProjectPanel() {
   }
 
   return (
-    <div className="rounded-xl border p-5">
+    <div className="rounded-xl border p-8">
       <div className="flex items-center justify-between gap-4">
-        <p className="text-sm font-medium">Your projects</p>
-        <Button size="sm" variant="outline" asChild>
+        <p className="text-lg font-semibold">Your projects</p>
+        <Button variant="outline" asChild>
           <Link href="/account/create-project">
             <Plus className="size-4" />
             Create project
@@ -149,7 +149,7 @@ function SubmitProjectPanel() {
             const isExpanded = expandedId === project.id
 
             return (
-              <li key={project.id} className="rounded-lg border p-4">
+              <li key={project.id} className="rounded-lg border p-5">
                 <div className="flex items-center justify-between gap-4">
                   <p className="min-w-0 truncate font-medium">{project.name}</p>
                   <span className="flex shrink-0 items-center gap-2">
