@@ -26,6 +26,7 @@ function OtherProjects({
   )
 
   for (let index = availableProjects.length - 1; index > 0; index -= 1) {
+    // eslint-disable-next-line react-hooks/purity
     const randomIndex = Math.floor(Math.random() * (index + 1))
     ;[availableProjects[index], availableProjects[randomIndex]] = [
       availableProjects[randomIndex],
@@ -73,8 +74,10 @@ function OtherProjects({
             <CardContent className="px-4 pb-3">
               <div className="flex flex-wrap gap-1">
                 {project.tags.slice(0, 3).map((tag) => (
-                  <Embed key={tag} variant="outline">
-                    {tag}
+                  <Embed key={tag} variant="outline" asChild>
+                    <Link href={`/?q=${encodeURIComponent(tag)}`}>
+                      {tag}
+                    </Link>
                   </Embed>
                 ))}
               </div>
