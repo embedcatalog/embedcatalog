@@ -249,8 +249,10 @@ export default async function ProjectPage({
               </h2>
               <div className="flex flex-wrap gap-1.5">
                 {project.tags.map((tag) => (
-                  <Embed key={tag} variant="outline">
-                    {tag}
+                  <Embed key={tag} variant="outline" asChild>
+                    <Link href={`/?q=${encodeURIComponent(tag)}`}>
+                      {tag}
+                    </Link>
                   </Embed>
                 ))}
               </div>
