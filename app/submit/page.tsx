@@ -53,7 +53,7 @@ export default function SubmitPage() {
           By submitting, you agree to the{" "}
           <Link
             href="/submission-terms"
-            className="font-medium text-foreground underline underline-offset-4"
+            className="font-medium text-foreground underline underline-offset-4 hover:no-underline"
           >
             Project Submission Terms
           </Link>
