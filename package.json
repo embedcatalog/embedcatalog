@@ -12,7 +12,8 @@
     "prod": "npm run build",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/newsletter-subscription.test.ts"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.24",
