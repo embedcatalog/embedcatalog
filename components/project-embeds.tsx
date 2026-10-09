@@ -20,6 +20,7 @@ import {
   getEmbedSize,
   getPublicCustomEmbedSrc,
   getPublicEmbedSrc,
+  getPublicStandaloneEmbedSrc,
 } from "lib/embed"
 import { siteConfig } from "lib/site"
 import { cn } from "lib/utils"
@@ -156,19 +157,16 @@ export function CustomEmbedCard({
   projectHref?: string
 }) {
   const [theme, setTheme] = React.useState<EmbedTheme>("light")
-  const [useLegacyStandalonePath, setUseLegacyStandalonePath] =
-    React.useState(false)
   const { width, height } = getCustomEmbedSize()
-  const standalonePath =
+  const embedSrc =
     standaloneProfileSlug && standaloneSlug
-      ? useLegacyStandalonePath
-        ? `user/${standaloneProfileSlug}/${standaloneSlug}${theme === "dark" ? ".theme-dark" : ""}.png`
-        : `user/${standaloneProfileSlug}/embeds/${standaloneSlug}${theme === "dark" ? ".theme-dark" : ""}.png`
-      : null
-  const embedSrc = standalonePath
-    ? supabase.storage.from("standalone-embeds").getPublicUrl(standalonePath)
-        .data.publicUrl
-    : getPublicCustomEmbedSrc(siteConfig.url, slug, shortId ?? "", theme)
+      ? getPublicStandaloneEmbedSrc(
+          siteConfig.url,
+          standaloneProfileSlug,
+          standaloneSlug,
+          theme
+        )
+      : getPublicCustomEmbedSrc(siteConfig.url, slug, shortId ?? "", theme)
   const html = buildEmbedImageHtml({
     projectUrl,
     title,
@@ -207,7 +205,6 @@ export function CustomEmbedCard({
             width={width}
             height={height}
             unoptimized
-            onError={() => setUseLegacyStandalonePath(true)}
           />
         </a>
         <EmbedHtmlLine code={html} />

@@ -8,7 +8,7 @@
   "description": "",
   "scripts": {
     "start": "next dev",
-    "build": "jiti scripts/generate-embed-pngs.tsx && next build",
+    "build": "next build",
     "prod": "npm run build",
     "serve": "next start",
     "lint": "eslint",

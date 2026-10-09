@@ -8,20 +8,7 @@ import {
   type EmbedTheme,
 } from "lib/embed"
 
-export const dynamic = "force-static"
-
-export async function generateStaticParams() {
-  const projects = await getPublishedProjects()
-  return projects.flatMap((project) =>
-    embedKinds.flatMap((kind) =>
-      embedThemes.map((theme) => ({
-        slug: project.slug,
-        kind,
-        theme,
-      }))
-    )
-  )
-}
+export const dynamic = "force-dynamic"
 
 export default async function EmbedPage({
   params,

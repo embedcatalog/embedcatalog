@@ -5,8 +5,6 @@ import { notFound } from "next/navigation"
 
 import { getPublishedProjects } from "lib/supabase/projects"
 import {
-  embedKinds,
-  embedThemes,
   getEmbedLines,
   getEmbedSize,
   getEmbedTheme,
@@ -14,24 +12,9 @@ import {
   type EmbedTheme,
 } from "lib/embed"
 
-export const dynamic = "force-static"
+export const dynamic = "force-dynamic"
 export const alt = "EmbedCatalog embed"
 export const contentType = "image/png"
-
-export async function generateStaticParams() {
-  const projects = await getPublishedProjects()
-  return projects.flatMap((project) =>
-    embedKinds
-      .filter((kind) => kind !== "organization" || project.premium)
-      .flatMap((kind) =>
-        embedThemes.map((theme) => ({
-          slug: project.slug,
-          kind,
-          theme,
-        }))
-      )
-  )
-}
 
 export default async function EmbedImage({
   params,

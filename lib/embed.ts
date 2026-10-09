@@ -163,6 +163,16 @@ function getPublicCustomEmbedSrc(
   return `${siteUrl}/embed/${slug}/${getCustomEmbedFileName(shortId, theme)}`
 }
 
+function getPublicStandaloneEmbedSrc(
+  siteUrl: string,
+  profileSlug: string,
+  embedSlug: string,
+  theme: EmbedTheme
+) {
+  const suffix = theme === "dark" ? ".theme-dark" : ""
+  return `${siteUrl}/user/${encodeURIComponent(profileSlug)}/embeds/${encodeURIComponent(embedSlug)}${suffix}.png`
+}
+
 export {
   embedKinds,
   embedThemes,
@@ -175,6 +185,7 @@ export {
   getEmbedTheme,
   getPublicCustomEmbedSrc,
   getPublicEmbedSrc,
+  getPublicStandaloneEmbedSrc,
   parseEmbedKind,
   themes,
 }

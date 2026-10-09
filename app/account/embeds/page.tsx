@@ -26,6 +26,8 @@ import {
   CardTitle,
 } from "components/ui/card"
 import type { Database } from "lib/supabase/database"
+import { getPublicStandaloneEmbedSrc } from "lib/embed"
+import { siteConfig } from "lib/site"
 import {
   imageHeight,
   imageWidth,
@@ -65,15 +67,15 @@ function StandaloneEmbedCard({
 }) {
   const [theme, setTheme] = React.useState<StandaloneEmbedTheme>("light")
   const [copied, setCopied] = React.useState(false)
-  const [useLegacyPath, setUseLegacyPath] = React.useState(false)
-  const suffix = theme === "dark" ? ".theme-dark" : ""
-  const path = profileSlug
-    ? useLegacyPath
-      ? `user/${profileSlug}/${embed.slug}${suffix}.png`
-      : `user/${profileSlug}/embeds/${embed.slug}${suffix}.png`
+  const imageSrc = profileSlug
+    ? getPublicStandaloneEmbedSrc(
+        siteConfig.url,
+        profileSlug,
+        embed.slug,
+        theme
+      )
     : ""
-  const { data } = supabase.storage.from("standalone-embeds").getPublicUrl(path)
-  const code = `<img src="${data.publicUrl}" alt="${embed.title}" width="${imageWidth}" height="${imageHeight}" />`
+  const code = `<img src="${imageSrc}" alt="${embed.title}" width="${imageWidth}" height="${imageHeight}" />`
 
   async function copyCode() {
     try {
@@ -175,7 +177,6 @@ function StandaloneEmbedCard({
                 aria-pressed={theme === "light"}
                 onClick={() => {
                   setTheme("light")
-                  setUseLegacyPath(false)
                 }}
               >
                 Light
@@ -187,19 +188,17 @@ function StandaloneEmbedCard({
                 aria-pressed={theme === "dark"}
                 onClick={() => {
                   setTheme("dark")
-                  setUseLegacyPath(false)
                 }}
               >
                 Dark
               </Button>
             </div>
             <Image
-              src={data.publicUrl}
+              src={imageSrc}
               alt={embed.title}
               width={imageWidth}
               height={imageHeight}
               unoptimized
-              onError={() => setUseLegacyPath(true)}
             />
             <code className="block overflow-x-auto rounded-md border bg-muted p-2 text-xs whitespace-nowrap text-muted-foreground">
               {code}

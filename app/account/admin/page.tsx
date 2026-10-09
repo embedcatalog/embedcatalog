@@ -23,10 +23,6 @@ import {
   CardTitle,
 } from "components/ui/card"
 import type { Database } from "lib/supabase/database"
-import {
-  renderStandaloneEmbedImage,
-  type StandaloneEmbedTheme,
-} from "lib/standalone-embed-image"
 import { supabase } from "lib/supabase/client"
 
 type ProjectStatus = "draft" | "pending" | "published" | "rejected"
@@ -281,46 +277,17 @@ function AdminPage() {
 
     setActioningId(embed.id)
     setProjectsError(null)
-    const basePath = `user/${embed.profileSlug}/embeds/${embed.slug}`
-    const uploadedPaths: string[] = []
+    const { error } = await supabase
+      .from("standalone_embeds")
+      .update({ status: "approved" })
+      .eq("id", embed.id)
+      .eq("status", "pending")
 
-    try {
-      const themes: StandaloneEmbedTheme[] = ["light", "dark"]
-      for (const theme of themes) {
-        const path = `${basePath}${theme === "dark" ? ".theme-dark" : ""}.png`
-        const image = await renderStandaloneEmbedImage(
-          embed.title,
-          embed.description,
-          theme
-        )
-        const { error: uploadError } = await supabase.storage
-          .from("standalone-embeds")
-          .upload(path, image, {
-            contentType: "image/png",
-            upsert: false,
-          })
-
-        if (uploadError) throw uploadError
-        uploadedPaths.push(path)
-      }
-
-      const { error: updateError } = await supabase
-        .from("standalone_embeds")
-        .update({ status: "approved" })
-        .eq("id", embed.id)
-        .eq("status", "pending")
-
-      if (updateError) throw updateError
-
+    if (error) {
+      setProjectsError(error.message)
+    } else {
       setPendingStandaloneEmbeds((current) =>
         current.filter((item) => item.id !== embed.id)
-      )
-    } catch (error) {
-      if (uploadedPaths.length) {
-        await supabase.storage.from("standalone-embeds").remove(uploadedPaths)
-      }
-      setProjectsError(
-        error instanceof Error ? error.message : "Could not approve this embed."
       )
     }
 

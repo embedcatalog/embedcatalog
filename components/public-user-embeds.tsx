@@ -14,6 +14,8 @@ import {
   CardTitle,
 } from "components/ui/card"
 import type { Database } from "lib/supabase/database"
+import { getPublicStandaloneEmbedSrc } from "lib/embed"
+import { siteConfig } from "lib/site"
 import type { StandaloneEmbedTheme } from "lib/standalone-embed-image"
 import { supabase } from "lib/supabase/client"
 
@@ -30,12 +32,12 @@ function PublicEmbedCard({
   embed: PublicEmbed
 }) {
   const [theme, setTheme] = React.useState<StandaloneEmbedTheme>("light")
-  const [useLegacyPath, setUseLegacyPath] = React.useState(false)
-  const suffix = theme === "dark" ? ".theme-dark" : ""
-  const path = useLegacyPath
-    ? `user/${profileSlug}/${embed.slug}${suffix}.png`
-    : `user/${profileSlug}/embeds/${embed.slug}${suffix}.png`
-  const { data } = supabase.storage.from("standalone-embeds").getPublicUrl(path)
+  const src = getPublicStandaloneEmbedSrc(
+    siteConfig.url,
+    profileSlug,
+    embed.slug,
+    theme
+  )
 
   return (
     <Card className="gap-4 py-4 shadow-none">
@@ -71,12 +73,11 @@ function PublicEmbedCard({
           </Button>
         </div>
         <Image
-          src={data.publicUrl}
+          src={src}
           alt={embed.title}
           width={320}
           height={84}
           unoptimized
-          onError={() => setUseLegacyPath(true)}
         />
       </CardContent>
     </Card>
