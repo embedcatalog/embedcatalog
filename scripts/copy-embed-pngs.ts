@@ -40,7 +40,7 @@ async function walk(dir: string) {
   )
 }
 
-await walk(join(process.cwd(), "out/embed"))
+await walk(join(process.cwd(), "public/embed"))
 console.log(
   "Copied embed images to {kind}.png / {kind}.theme-light.png / {kind}.theme-dark.png"
 )

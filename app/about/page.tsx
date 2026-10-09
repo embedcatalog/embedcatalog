@@ -384,7 +384,9 @@ export default function AboutPage() {
                 <TableBody>
                   <TableRow>
                     <TableCell className="font-medium">Framework</TableCell>
-                    <TableCell>Next.js 16, App Router, static export</TableCell>
+                    <TableCell>
+                      Next.js 16, App Router, server runtime
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell className="font-medium">Language</TableCell>

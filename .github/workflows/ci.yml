@@ -1,4 +1,4 @@
-name: Deploy Next.js site to Pages
+name: CI
 
 on:
   push:
@@ -7,16 +7,10 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
-    name: Build
+    name: Check and build
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
@@ -32,9 +26,6 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v6
-
       - name: Restore Next.js cache
         uses: actions/cache@v4
         with:
@@ -46,22 +37,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
       - name: Build
         run: npm run build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: ./out
-
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5

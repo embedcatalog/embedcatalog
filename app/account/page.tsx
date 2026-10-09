@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation"
 import {
   Bookmark,
   FolderKanban,
+  Images,
   Loader2,
   LogOut,
+  Pencil,
   Plus,
   Settings,
   ShieldCheck,
@@ -23,6 +25,8 @@ import {
   CardHeader,
   CardTitle,
 } from "components/ui/card"
+import { Input } from "components/ui/input"
+import { Label } from "components/ui/label"
 import { useAuth } from "components/auth-provider"
 import {
   ProjectsGrid,
@@ -52,6 +56,12 @@ function AccountPage({
   const [activeSection, setActiveSection] = React.useState<
     "settings" | "projects" | "bookmarks"
   >(initialSection)
+  const avatarInputRef = React.useRef<HTMLInputElement>(null)
+  const [avatarUploading, setAvatarUploading] = React.useState(false)
+  const [avatarError, setAvatarError] = React.useState<string | null>(null)
+  const [profileSaving, setProfileSaving] = React.useState(false)
+  const [profileError, setProfileError] = React.useState<string | null>(null)
+  const [profileSaved, setProfileSaved] = React.useState(false)
   const [projects, setProjects] = React.useState<OwnedProject[]>([])
   const [projectsLoading, setProjectsLoading] = React.useState(false)
   const [projectsError, setProjectsError] = React.useState<string | null>(null)
@@ -257,6 +267,84 @@ function AccountPage({
     setDeletingProjectId(null)
   }
 
+  async function changeAvatar(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file || !user) return
+
+    const isGif =
+      file.type.toLowerCase() === "image/gif" ||
+      file.name.toLowerCase().endsWith(".gif")
+    if (!file.type.startsWith("image/") || isGif) {
+      setAvatarError("Choose a PNG, JPEG, or WebP image.")
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError("Avatar must be smaller than 2 MB.")
+      return
+    }
+
+    setAvatarUploading(true)
+    setAvatarError(null)
+
+    const extension = file.name
+      .split(".")
+      .pop()
+      ?.replace(/[^a-zA-Z0-9]/g, "")
+    const path = `avatars/${user.id}/${crypto.randomUUID()}.${extension || "png"}`
+    const { error: uploadError } = await supabase.storage
+      .from("project-images")
+      .upload(path, file, { upsert: false })
+
+    if (uploadError) {
+      setAvatarUploading(false)
+      setAvatarError(`Avatar upload failed: ${uploadError.message}`)
+      return
+    }
+
+    const { data } = supabase.storage.from("project-images").getPublicUrl(path)
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: { custom_avatar_url: data.publicUrl },
+    })
+
+    setAvatarUploading(false)
+    if (updateError) setAvatarError(updateError.message)
+  }
+
+  async function saveProfile(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!user) return
+
+    const formData = new FormData(event.currentTarget)
+    const profileName = String(formData.get("name") ?? "").trim()
+    const profileTwitter = String(formData.get("twitter") ?? "").trim()
+    const profileYoutube = String(formData.get("youtube") ?? "").trim()
+    const profileGithub = String(formData.get("github") ?? "").trim()
+
+    setProfileSaving(true)
+    setProfileError(null)
+    setProfileSaved(false)
+
+    const profileSocials = {
+      ...(profileTwitter ? { twitter: profileTwitter } : {}),
+      ...(profileYoutube ? { youtube: profileYoutube } : {}),
+      ...(profileGithub ? { github: profileGithub } : {}),
+    }
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        full_name: profileName,
+        profile_socials: profileSocials,
+      },
+    })
+
+    setProfileSaving(false)
+    if (error) {
+      setProfileError(error.message)
+      return
+    }
+    setProfileSaved(true)
+  }
+
   if (loading || !user) {
     return (
       <div className="flex min-h-[70svh] items-center justify-center">
@@ -265,11 +353,20 @@ function AccountPage({
     )
   }
 
-  const avatarUrl = user.user_metadata?.avatar_url as string | undefined
+  const avatarUrl = (user.user_metadata?.custom_avatar_url ??
+    user.user_metadata?.avatar_url) as string | undefined
   const displayName =
     (user.user_metadata?.full_name as string | undefined) ??
     (user.user_metadata?.user_name as string | undefined) ??
     user.email
+  const login = String(
+    user.user_metadata?.user_name ??
+      user.user_metadata?.preferred_username ??
+      user.email?.split("@")[0] ??
+      ""
+  )
+  const profileSocials = user.user_metadata?.profile_socials as
+    { twitter?: string; youtube?: string; github?: string } | undefined
 
   return (
     <div className="site-container py-8 sm:py-12">
@@ -277,7 +374,7 @@ function AccountPage({
         <aside className="flex flex-col border-b pb-6 md:min-h-[28rem] md:border-r md:border-b-0 md:pr-6 md:pb-0">
           <p className="px-3 text-sm font-medium">Account</p>
           <nav
-            className="mt-3 flex gap-1 md:flex-col"
+            className="mt-3 grid grid-cols-2 gap-1 md:flex md:flex-col"
             aria-label="Account navigation"
           >
             <Button
@@ -285,9 +382,9 @@ function AccountPage({
               className="flex-1 justify-start md:flex-none"
               asChild
             >
-              <Link href="/account/create-project">
+              <Link href="/account/create">
                 <Plus className="size-4" />
-                Create project
+                Create
               </Link>
             </Button>
             <Button
@@ -304,7 +401,17 @@ function AccountPage({
               onClick={showProjects}
             >
               <FolderKanban className="size-4" />
-              My projects
+              Projects
+            </Button>
+            <Button
+              variant="ghost"
+              className="flex-1 justify-start md:flex-none"
+              asChild
+            >
+              <Link href="/account/embeds">
+                <Images className="size-4" />
+                Embeds
+              </Link>
             </Button>
             <Button
               variant={activeSection === "bookmarks" ? "secondary" : "ghost"}
@@ -347,28 +454,148 @@ function AccountPage({
                 <CardDescription>Manage your profile.</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center gap-4">
-                  {avatarUrl ? (
-                    <Image
-                      src={avatarUrl}
-                      alt={displayName ?? "Avatar"}
-                      width={56}
-                      height={56}
-                      className="size-14 rounded-full"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="flex size-14 items-center justify-center rounded-full bg-muted text-lg font-medium text-muted-foreground">
-                      {displayName?.[0]?.toUpperCase() ?? "?"}
+                <form className="flex flex-col gap-5" onSubmit={saveProfile}>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={(event) => void changeAvatar(event)}
+                  />
+                  <div className="flex items-center gap-4">
+                    <div className="relative size-14 shrink-0">
+                      {avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt={displayName ?? "Avatar"}
+                          width={56}
+                          height={56}
+                          className="size-14 rounded-full"
+                          unoptimized
+                        />
+                      ) : (
+                        <div className="flex size-14 items-center justify-center rounded-full bg-muted text-lg font-medium text-muted-foreground">
+                          {displayName?.[0]?.toUpperCase() ?? "?"}
+                        </div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        className="absolute -right-1 -bottom-1 size-7 rounded-full border shadow-sm"
+                        aria-label="Change avatar"
+                        title={
+                          avatarUploading ? "Uploading avatar" : "Change avatar"
+                        }
+                        disabled={avatarUploading}
+                        onClick={() => avatarInputRef.current?.click()}
+                      >
+                        {avatarUploading ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Pencil className="size-3.5" />
+                        )}
+                      </Button>
                     </div>
-                  )}
-                  <div className="min-w-0">
-                    <p className="truncate font-medium">{displayName}</p>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {user.email}
-                    </p>
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{displayName}</p>
+                      <p className="truncate text-sm text-muted-foreground">
+                        {user.email}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                  {avatarError && (
+                    <p className="text-sm text-destructive" role="alert">
+                      {avatarError}
+                    </p>
+                  )}
+                  <div className="flex flex-col gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="profile-login">Login</Label>
+                      <Input
+                        id="profile-login"
+                        value={login}
+                        readOnly
+                        aria-readonly="true"
+                        autoComplete="username"
+                        className="bg-muted text-muted-foreground"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="profile-name">Name</Label>
+                      <Input
+                        id="profile-name"
+                        name="name"
+                        autoComplete="name"
+                        defaultValue={
+                          (user.user_metadata?.full_name as
+                            string | undefined) ??
+                          (user.user_metadata?.user_name as
+                            string | undefined) ??
+                          ""
+                        }
+                        onChange={() => setProfileSaved(false)}
+                        placeholder="Your name"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="profile-twitter">Twitter</Label>
+                      <Input
+                        id="profile-twitter"
+                        name="twitter"
+                        type="url"
+                        autoComplete="url"
+                        defaultValue={profileSocials?.twitter ?? ""}
+                        onChange={() => setProfileSaved(false)}
+                        placeholder="https://twitter.com/username"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="profile-youtube">YouTube</Label>
+                      <Input
+                        id="profile-youtube"
+                        name="youtube"
+                        type="url"
+                        autoComplete="url"
+                        defaultValue={profileSocials?.youtube ?? ""}
+                        onChange={() => setProfileSaved(false)}
+                        placeholder="https://youtube.com/@channel"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="profile-github">GitHub</Label>
+                      <Input
+                        id="profile-github"
+                        name="github"
+                        type="url"
+                        autoComplete="url"
+                        defaultValue={profileSocials?.github ?? ""}
+                        onChange={() => setProfileSaved(false)}
+                        placeholder="https://github.com/username"
+                      />
+                    </div>
+                  </div>
+                  {profileError && (
+                    <p className="text-sm text-destructive" role="alert">
+                      {profileError}
+                    </p>
+                  )}
+                  {profileSaved && (
+                    <p className="text-sm text-muted-foreground" role="status">
+                      Profile saved.
+                    </p>
+                  )}
+                  <Button
+                    className="w-full"
+                    type="submit"
+                    disabled={profileSaving}
+                  >
+                    {profileSaving && (
+                      <Loader2 className="size-4 animate-spin" />
+                    )}
+                    {profileSaving ? "Saving profile" : "Save profile"}
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           ) : activeSection === "projects" ? (

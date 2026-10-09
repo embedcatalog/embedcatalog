@@ -23,6 +23,7 @@ import {
 } from "lib/embed"
 import { siteConfig } from "lib/site"
 import { cn } from "lib/utils"
+import { supabase } from "lib/supabase/client"
 
 function buildEmbedHtml({
   projectUrl,
@@ -138,21 +139,36 @@ function buildEmbedImageHtml({
 export function CustomEmbedCard({
   slug,
   shortId,
+  standaloneProfileSlug,
+  standaloneSlug,
   projectUrl,
   title,
   projectName,
   projectHref,
 }: {
   slug: string
-  shortId: string
+  shortId?: string
+  standaloneProfileSlug?: string
+  standaloneSlug?: string
   projectUrl: string
   title: string
   projectName?: string
   projectHref?: string
 }) {
   const [theme, setTheme] = React.useState<EmbedTheme>("light")
+  const [useLegacyStandalonePath, setUseLegacyStandalonePath] =
+    React.useState(false)
   const { width, height } = getCustomEmbedSize()
-  const embedSrc = getPublicCustomEmbedSrc(siteConfig.url, slug, shortId, theme)
+  const standalonePath =
+    standaloneProfileSlug && standaloneSlug
+      ? useLegacyStandalonePath
+        ? `user/${standaloneProfileSlug}/${standaloneSlug}${theme === "dark" ? ".theme-dark" : ""}.png`
+        : `user/${standaloneProfileSlug}/embeds/${standaloneSlug}${theme === "dark" ? ".theme-dark" : ""}.png`
+      : null
+  const embedSrc = standalonePath
+    ? supabase.storage.from("standalone-embeds").getPublicUrl(standalonePath)
+        .data.publicUrl
+    : getPublicCustomEmbedSrc(siteConfig.url, slug, shortId ?? "", theme)
   const html = buildEmbedImageHtml({
     projectUrl,
     title,
@@ -191,6 +207,7 @@ export function CustomEmbedCard({
             width={width}
             height={height}
             unoptimized
+            onError={() => setUseLegacyStandalonePath(true)}
           />
         </a>
         <EmbedHtmlLine code={html} />
@@ -216,6 +233,8 @@ function EmbedCard({
   premium?: boolean
   isPremium?: boolean
 }) {
+  const [theme, setTheme] = React.useState<EmbedTheme>("light")
+
   if (premium && !isPremium) {
     return (
       <Card className="gap-4 py-4 shadow-none">
@@ -241,7 +260,6 @@ function EmbedCard({
     )
   }
 
-  const [theme, setTheme] = React.useState<EmbedTheme>("light")
   const { width, height } = getEmbedSize(kind)
   const embedSrc = getPublicEmbedSrc(siteConfig.url, slug, kind, theme)
   const html = buildEmbedHtml({
@@ -289,20 +307,24 @@ function EmbedCard({
 
 export type CustomEmbed = {
   id: string
-  shortId: string
+  shortId?: string
   title: string
   description: string
+  standaloneProfileSlug?: string
+  standaloneSlug?: string
 }
 
 type EmbedTab = "default" | "premium" | "custom"
 
 function ProjectEmbeds({
+  projectId,
   slug,
   projectName,
   externalUrl,
   isPremium,
   customEmbeds,
 }: {
+  projectId: string
   slug: string
   projectName: string
   externalUrl: string
@@ -311,6 +333,55 @@ function ProjectEmbeds({
 }) {
   const catalogUrl = `${siteConfig.url}/projects/${slug}`
   const [tab, setTab] = React.useState<EmbedTab>("default")
+  const [attachedStandaloneEmbeds, setAttachedStandaloneEmbeds] =
+    React.useState<CustomEmbed[]>([])
+
+  React.useEffect(() => {
+    let cancelled = false
+
+    async function loadAttachedEmbeds() {
+      const { data: embeds, error: embedsError } = await supabase
+        .from("standalone_embeds")
+        .select("id, owner_id, slug, title, description, project_id, status")
+        .eq("project_id", projectId)
+        .eq("status", "approved")
+
+      if (cancelled || embedsError || !embeds?.length) return
+
+      const ownerIds = [...new Set(embeds.map((embed) => embed.owner_id))]
+      const { data: profiles, error: profilesError } = await supabase
+        .from("standalone_embed_profiles")
+        .select("owner_id, slug")
+        .in("owner_id", ownerIds)
+
+      if (cancelled || profilesError || !profiles) return
+
+      const profileSlugs = new Map(
+        profiles.map((profile) => [profile.owner_id, profile.slug])
+      )
+      setAttachedStandaloneEmbeds(
+        embeds.flatMap((embed) => {
+          const profileSlug = profileSlugs.get(embed.owner_id)
+          if (!profileSlug) return []
+
+          return [
+            {
+              id: embed.id,
+              title: embed.title,
+              description: embed.description,
+              standaloneProfileSlug: profileSlug,
+              standaloneSlug: embed.slug,
+            },
+          ]
+        })
+      )
+    }
+
+    void loadAttachedEmbeds()
+    return () => {
+      cancelled = true
+    }
+  }, [projectId])
 
   const defaultGroups = [
     { title: "License", kind: "license" as const },
@@ -392,11 +463,13 @@ function ProjectEmbeds({
               This project hasn&rsquo;t added any custom embeds yet.
             </p>
           ) : (
-            customEmbeds.map((embed) => (
+            [...customEmbeds, ...attachedStandaloneEmbeds].map((embed) => (
               <CustomEmbedCard
                 key={embed.id}
-                slug={slug}
+                slug={embed.standaloneProfileSlug ?? slug}
                 shortId={embed.shortId}
+                standaloneProfileSlug={embed.standaloneProfileSlug}
+                standaloneSlug={embed.standaloneSlug}
                 projectUrl={externalUrl}
                 title={embed.title}
               />

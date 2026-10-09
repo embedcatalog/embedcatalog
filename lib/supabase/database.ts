@@ -19,6 +19,49 @@ export type Database = {
         }
         Relationships: []
       }
+      standalone_embed_profiles: {
+        Row: {
+          owner_id: string
+          slug: string
+          created_at: string
+        }
+        Insert: {
+          owner_id: string
+          slug: string
+          created_at?: string
+        }
+        Update: {
+          slug?: string
+        }
+        Relationships: []
+      }
+      standalone_embeds: {
+        Row: {
+          id: string
+          owner_id: string
+          slug: string
+          title: string
+          description: string
+          project_id: string | null
+          status: "pending" | "approved" | "rejected"
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          slug: string
+          title: string
+          description?: string
+          project_id?: string | null
+          status?: "pending" | "approved" | "rejected"
+          created_at?: string
+        }
+        Update: {
+          project_id?: string | null
+          status?: "pending" | "approved" | "rejected"
+        }
+        Relationships: []
+      }
       project_embeds: {
         Row: {
           id: string
@@ -195,6 +238,10 @@ export type Database = {
     Functions: {
       approve_project_edit_request: {
         Args: { request_id: string }
+        Returns: undefined
+      }
+      set_standalone_embed_project: {
+        Args: { p_embed_id: string; p_project_id: string | null }
         Returns: undefined
       }
       record_project_impressions: {

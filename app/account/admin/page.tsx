@@ -22,6 +22,11 @@ import {
   CardHeader,
   CardTitle,
 } from "components/ui/card"
+import type { Database } from "lib/supabase/database"
+import {
+  renderStandaloneEmbedImage,
+  type StandaloneEmbedTheme,
+} from "lib/standalone-embed-image"
 import { supabase } from "lib/supabase/client"
 
 type ProjectStatus = "draft" | "pending" | "published" | "rejected"
@@ -44,6 +49,10 @@ type ProjectEditRequest = {
   tags: string[] | null
   created_at: string
 }
+type StandaloneEmbedSubmission =
+  Database["public"]["Tables"]["standalone_embeds"]["Row"] & {
+    profileSlug: string
+  }
 
 function AdminPage() {
   const router = useRouter()
@@ -55,6 +64,11 @@ function AdminPage() {
   const [pendingEdits, setPendingEdits] = React.useState<ProjectEditRequest[]>(
     []
   )
+  const [pendingStandaloneEmbeds, setPendingStandaloneEmbeds] = React.useState<
+    StandaloneEmbedSubmission[]
+  >([])
+  const [standaloneEmbedsLoading, setStandaloneEmbedsLoading] =
+    React.useState(true)
 
   React.useEffect(() => {
     if (!loading && (!user || !isAdmin)) router.replace("/account")
@@ -81,6 +95,58 @@ function AdminPage() {
         setProjectsLoading(false)
       })
 
+    return () => {
+      cancelled = true
+    }
+  }, [user, isAdmin])
+
+  React.useEffect(() => {
+    if (!user || !isAdmin) return
+
+    let cancelled = false
+
+    async function loadPendingStandaloneEmbeds() {
+      const [embedsResult, profilesResult] = await Promise.all([
+        supabase
+          .from("standalone_embeds")
+          .select(
+            "id, owner_id, slug, title, description, project_id, status, created_at"
+          )
+          .eq("status", "pending")
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("standalone_embed_profiles")
+          .select("owner_id, slug, created_at"),
+      ])
+
+      if (cancelled) return
+
+      if (embedsResult.error || profilesResult.error) {
+        setProjectsError(
+          embedsResult.error?.message ??
+            profilesResult.error?.message ??
+            "Could not load pending embeds."
+        )
+        setStandaloneEmbedsLoading(false)
+        return
+      }
+
+      const profileSlugs = new Map(
+        (profilesResult.data ?? []).map((profile) => [
+          profile.owner_id,
+          profile.slug,
+        ])
+      )
+      setPendingStandaloneEmbeds(
+        (embedsResult.data ?? []).map((embed) => ({
+          ...embed,
+          profileSlug: profileSlugs.get(embed.owner_id) ?? "",
+        }))
+      )
+      setStandaloneEmbedsLoading(false)
+    }
+
+    void loadPendingStandaloneEmbeds()
     return () => {
       cancelled = true
     }
@@ -202,6 +268,82 @@ function AdminPage() {
 
     setPendingEdits((current) =>
       current.filter((request) => request.id !== requestId)
+    )
+  }
+
+  async function approveStandaloneEmbed(embed: StandaloneEmbedSubmission) {
+    if (!embed.profileSlug) {
+      setProjectsError(
+        "This embed has no profile slug and cannot be published."
+      )
+      return
+    }
+
+    setActioningId(embed.id)
+    setProjectsError(null)
+    const basePath = `user/${embed.profileSlug}/embeds/${embed.slug}`
+    const uploadedPaths: string[] = []
+
+    try {
+      const themes: StandaloneEmbedTheme[] = ["light", "dark"]
+      for (const theme of themes) {
+        const path = `${basePath}${theme === "dark" ? ".theme-dark" : ""}.png`
+        const image = await renderStandaloneEmbedImage(
+          embed.title,
+          embed.description,
+          theme
+        )
+        const { error: uploadError } = await supabase.storage
+          .from("standalone-embeds")
+          .upload(path, image, {
+            contentType: "image/png",
+            upsert: false,
+          })
+
+        if (uploadError) throw uploadError
+        uploadedPaths.push(path)
+      }
+
+      const { error: updateError } = await supabase
+        .from("standalone_embeds")
+        .update({ status: "approved" })
+        .eq("id", embed.id)
+        .eq("status", "pending")
+
+      if (updateError) throw updateError
+
+      setPendingStandaloneEmbeds((current) =>
+        current.filter((item) => item.id !== embed.id)
+      )
+    } catch (error) {
+      if (uploadedPaths.length) {
+        await supabase.storage.from("standalone-embeds").remove(uploadedPaths)
+      }
+      setProjectsError(
+        error instanceof Error ? error.message : "Could not approve this embed."
+      )
+    }
+
+    setActioningId(null)
+  }
+
+  async function rejectStandaloneEmbed(embedId: string) {
+    setActioningId(embedId)
+    setProjectsError(null)
+    const { error } = await supabase
+      .from("standalone_embeds")
+      .update({ status: "rejected" })
+      .eq("id", embedId)
+      .eq("status", "pending")
+    setActioningId(null)
+
+    if (error) {
+      setProjectsError(error.message)
+      return
+    }
+
+    setPendingStandaloneEmbeds((current) =>
+      current.filter((embed) => embed.id !== embedId)
     )
   }
 
@@ -398,6 +540,70 @@ function AdminPage() {
                           Reject
                         </Button>
                       </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">
+                Embeds to approve ({pendingStandaloneEmbeds.length})
+              </CardTitle>
+              <CardDescription>
+                Approving an embed generates and publishes its image files.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              {standaloneEmbedsLoading ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="size-4 animate-spin" />
+                  Loading embeds
+                </div>
+              ) : pendingStandaloneEmbeds.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No standalone embeds waiting for review.
+                </p>
+              ) : (
+                pendingStandaloneEmbeds.map((embed) => (
+                  <div
+                    key={embed.id}
+                    className="flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-start sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium">{embed.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        /user/{embed.profileSlug}/embeds/{embed.slug}.png
+                      </p>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {embed.description || "No description provided."}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => void approveStandaloneEmbed(embed)}
+                        disabled={actioningId === embed.id}
+                      >
+                        {actioningId === embed.id ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Check className="size-4" />
+                        )}
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => void rejectStandaloneEmbed(embed.id)}
+                        disabled={actioningId === embed.id}
+                      >
+                        <X className="size-4" />
+                        Reject
+                      </Button>
                     </div>
                   </div>
                 ))

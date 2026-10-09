@@ -8,8 +8,9 @@
   "description": "",
   "scripts": {
     "start": "next dev",
-    "build": "next build && jiti scripts/generate-embed-pngs.tsx",
+    "build": "jiti scripts/generate-embed-pngs.tsx && next build",
     "prod": "npm run build",
+    "serve": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"

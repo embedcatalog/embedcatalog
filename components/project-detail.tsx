@@ -54,6 +54,7 @@ function ProjectDetail({
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
+          projectId={project.id}
           Back to projects
         </Link>
 
@@ -144,6 +145,7 @@ function ProjectDetail({
           <ImageCarousel images={project.images} alt={project.name} />
         </div>
         <ProjectEmbeds
+          projectId={project.id}
           slug={project.slug}
           projectName={project.name}
           externalUrl={project.url}
@@ -161,9 +163,7 @@ function ProjectDetail({
           <div className="flex flex-wrap gap-1.5">
             {project.tags.map((tag) => (
               <Embed key={tag} variant="outline" asChild>
-                <Link href={`/?q=${encodeURIComponent(tag)}`}>
-                  {tag}
-                </Link>
+                <Link href={`/?q=${encodeURIComponent(tag)}`}>{tag}</Link>
               </Embed>
             ))}
           </div>

@@ -9,6 +9,7 @@ import {
   Moon,
   Bookmark,
   FolderKanban,
+  Images,
   Plus,
   Settings,
   ShieldCheck,
@@ -50,7 +51,8 @@ function ThemeToggle() {
 function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
   const { user, loading, isAdmin, signOut } = useAuth()
-  const avatarUrl = user?.user_metadata?.avatar_url
+  const avatarUrl =
+    user?.user_metadata?.custom_avatar_url ?? user?.user_metadata?.avatar_url
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
     (user?.user_metadata?.user_name as string | undefined) ??
@@ -119,11 +121,11 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
                       <DropdownMenu.Separator className="my-1 h-px bg-border" />
                       <DropdownMenu.Item asChild>
                         <Link
-                          href="/account/create-project"
+                          href="/account/create"
                           className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
                         >
                           <Plus className="size-4" />
-                          Create project
+                          Create
                         </Link>
                       </DropdownMenu.Item>
                       <DropdownMenu.Item asChild>
@@ -141,7 +143,16 @@ function Header({ githubSlot }: { githubSlot?: React.ReactNode }) {
                           className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
                         >
                           <FolderKanban className="size-4" />
-                          My projects
+                          Projects
+                        </Link>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item asChild>
+                        <Link
+                          href="/account/embeds"
+                          className="flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent focus:bg-accent"
+                        >
+                          <Images className="size-4" />
+                          Embeds
                         </Link>
                       </DropdownMenu.Item>
                       <DropdownMenu.Item asChild>

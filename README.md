@@ -144,7 +144,7 @@ This flow allows us to work on projects as efficiently as possible. Also, if we 
 
 | Layer     | Stack                                       |
 | --------- | ------------------------------------------- |
-| Framework | Next.js 16 (App Router, static export)      |
+| Framework | Next.js 16 (App Router, server runtime)     |
 | Language  | TypeScript                                  |
 | Styling   | Tailwind CSS v4, ShadCN-based UI components |
 | Markdown  | react-markdown + remark-gfm                 |
@@ -192,23 +192,38 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ### Environment variables
 
-| Variable                        | Used by             | Purpose                                        |
-| ------------------------------- | ------------------- | ---------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | App, scripts        | Supabase project URL                           |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | App                 | Public client for auth and data access         |
-| `SUPABASE_SERVICE_ROLE_KEY`     | `sync-github-stats` | Server-side updates to GitHub stats            |
-| `GITHUB_TOKEN`                  | `sync-github-stats` | Reads stars/forks/contributors from GitHub API |
+| Variable                        | Used by             | Purpose                                                     |
+| ------------------------------- | ------------------- | ----------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`          | App                 | Canonical site URL (defaults to `https://embedcatalog.com`) |
+| `NEXT_PUBLIC_SUPABASE_URL`      | App, scripts        | Supabase project URL                                        |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | App                 | Public client for auth and data access                      |
+| `SUPABASE_SERVICE_ROLE_KEY`     | `sync-github-stats` | Server-side updates to GitHub stats                         |
+| `GITHUB_TOKEN`                  | `sync-github-stats` | Reads stars/forks/contributors from GitHub API              |
 
 ### Available scripts
 
-| Script              | What it does                                        |
-| ------------------- | --------------------------------------------------- |
-| `npm run start`     | Runs the app in development mode                    |
-| `npm run build`     | Builds the static export and pre-renders embed PNGs |
-| `npm run prod`      | Alias for `build`, used in production deploys       |
-| `npm run lint`      | Runs ESLint                                         |
-| `npm run format`    | Formats the codebase with Prettier                  |
-| `npm run typecheck` | Runs the TypeScript compiler in `--noEmit` mode     |
+| Script              | What it does                                    |
+| ------------------- | ----------------------------------------------- |
+| `npm run start`     | Runs the app in development mode                |
+| `npm run build`     | Generates project embed PNGs and builds Next.js |
+| `npm run serve`     | Runs the production Next.js server              |
+| `npm run prod`      | Alias for `build`, used by Vercel               |
+| `npm run lint`      | Runs ESLint                                     |
+| `npm run format`    | Formats the codebase with Prettier              |
+| `npm run typecheck` | Runs the TypeScript compiler in `--noEmit` mode |
+
+### Deployment
+
+The app requires a Node.js-capable Next.js host. To deploy with Vercel, import
+the GitHub repository as a Next.js project, keep the root directory and output
+directory at their defaults, and add `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` to the Production and Preview environments.
+The build generates embed images from Supabase, so these values must be
+available during the build. Set `NEXT_PUBLIC_SITE_URL` to the canonical
+production URL in the Production environment if it differs from the default.
+Vercel deploys pushes to the connected branches automatically. GitHub Pages
+static hosting is not supported because user profile routes are resolved at
+runtime.
 
 ## Data Synchronization
 

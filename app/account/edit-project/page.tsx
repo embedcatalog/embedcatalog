@@ -4,7 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ChevronLeft, Loader2, Plus, Trash2, X } from "lucide-react"
+import { ChevronLeft, Loader2, Pencil, X } from "lucide-react"
 
 import { useAuth } from "components/auth-provider"
 import { useNotification } from "components/notification-provider"
@@ -29,12 +29,6 @@ type Embed = {
   description: string
 }
 
-const defaultEmbed = (id: number): Embed => ({
-  id,
-  title: "Built with EmbedCatalog",
-  description: "A project worth checking out.",
-})
-
 function EditProjectForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -51,7 +45,7 @@ function EditProjectForm() {
   const [twitterUrl, setTwitterUrl] = React.useState("")
   const [youtubeUrl, setYoutubeUrl] = React.useState("")
   const [githubUrl, setGithubUrl] = React.useState("")
-  const [embeds, setEmbeds] = React.useState<Embed[]>([defaultEmbed(1)])
+  const [embeds, setEmbeds] = React.useState<Embed[]>([])
   const [saveError, setSaveError] = React.useState<string | null>(null)
   const [saving, setSaving] = React.useState(false)
   const [fetching, setFetching] = React.useState(true)
@@ -134,16 +128,14 @@ function EditProjectForm() {
         return
       }
 
-      if (projectEmbeds && projectEmbeds.length > 0) {
-        setEmbeds(
-          projectEmbeds.map((embed, index) => ({
-            id: index + 1,
-            shortId: embed.short_id,
-            title: embed.title,
-            description: embed.description,
-          }))
-        )
-      }
+      setEmbeds(
+        (projectEmbeds ?? []).map((embed, index) => ({
+          id: index + 1,
+          shortId: embed.short_id,
+          title: embed.title,
+          description: embed.description,
+        }))
+      )
 
       setFetching(false)
     }
@@ -176,14 +168,6 @@ function EditProjectForm() {
           {fetchError}
         </p>
       </main>
-    )
-  }
-
-  function updateEmbed(id: number, changes: Partial<Embed>) {
-    setEmbeds((current) =>
-      current.map((embed) =>
-        embed.id === id ? { ...embed, ...changes } : embed
-      )
     )
   }
 
@@ -296,34 +280,7 @@ function EditProjectForm() {
       return
     }
 
-    const { error: deleteError } = await supabase
-      .from("project_embeds")
-      .delete()
-      .eq("project_id", projectId as string)
-
-    if (deleteError) {
-      setSaving(false)
-      setSaveError(
-        `Project was updated, but embeds were not saved: ${deleteError.message}`
-      )
-      return
-    }
-
-    const { error: embedsError } = await supabase.from("project_embeds").insert(
-      embedPayload.map((embed) => ({
-        ...embed,
-        project_id: projectId as string,
-      }))
-    )
-
     setSaving(false)
-
-    if (embedsError) {
-      setSaveError(
-        `Project was updated, but embeds were not saved: ${embedsError.message}`
-      )
-      return
-    }
 
     notify("Project updated successfully.")
     router.push("/account/projects")
@@ -549,105 +506,23 @@ function EditProjectForm() {
               </CardContent>
             </Card>
 
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <h2 className="font-semibold">Embeds</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Create as many variations as you need.
-                </p>
-              </div>
-              <Button
-                size="sm"
-                onClick={() =>
-                  setEmbeds((current) => [...current, defaultEmbed(Date.now())])
-                }
-              >
-                <Plus className="size-4" />
-                Add embed
-              </Button>
-            </div>
-            {embeds.map((embed, index) => {
-              const colors = {
-                background: "#ffffff",
-                border: "#d4d4d4",
-                text: "#171717",
-                muted: "#737373",
-              }
-              return (
-                <Card key={embed.id}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Embed {index + 1}</CardTitle>
-                    {embeds.length > 1 && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        aria-label={`Remove embed ${index + 1}`}
-                        onClick={() =>
-                          setEmbeds((current) =>
-                            current.filter((item) => item.id !== embed.id)
-                          )
-                        }
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    )}
-                  </CardHeader>
-                  <CardContent className="grid gap-5">
-                    <div className="grid gap-2">
-                      <Label htmlFor={`embed-title-${embed.id}`}>Title</Label>
-                      <Input
-                        id={`embed-title-${embed.id}`}
-                        value={embed.title}
-                        onChange={(event) =>
-                          updateEmbed(embed.id, { title: event.target.value })
-                        }
-                        maxLength={80}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor={`embed-description-${embed.id}`}>
-                        Description
-                      </Label>
-                      <Textarea
-                        id={`embed-description-${embed.id}`}
-                        value={embed.description}
-                        onChange={(event) =>
-                          updateEmbed(embed.id, {
-                            description: event.target.value,
-                          })
-                        }
-                        maxLength={160}
-                      />
-                    </div>
-                  </CardContent>
-                  <CardContent className="border-t pt-6">
-                    <div className="flex min-h-32 items-center justify-center rounded-md border border-dashed bg-muted/40 p-5">
-                      <div
-                        className="w-full max-w-xs rounded border p-4"
-                        style={{
-                          backgroundColor: colors.background,
-                          borderColor: colors.border,
-                          color: colors.text,
-                        }}
-                      >
-                        <p className="text-sm leading-5 font-semibold">
-                          {embed.title || title || "Untitled embed"}
-                        </p>
-                        {embed.description && (
-                          <p
-                            className="mt-1 text-xs leading-[18px]"
-                            style={{ color: colors.muted }}
-                          >
-                            {embed.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            })}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Embeds</CardTitle>
+                <CardDescription>
+                  {embeds.length} embed{embeds.length === 1 ? "" : "s"} on this
+                  project. Embeds are edited in a separate editor.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" asChild>
+                  <Link href={`/account/edit-embeds?id=${projectId}`}>
+                    <Pencil className="size-4" />
+                    Open embed editor
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-20">

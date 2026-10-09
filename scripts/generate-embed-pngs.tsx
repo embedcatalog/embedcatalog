@@ -37,7 +37,7 @@ type CustomEmbedRow = {
   description: string
 }
 
-const outputRoot = join(process.cwd(), "out/embed")
+const outputRoot = join(process.cwd(), "public/embed")
 const font = await readFile(
   join(process.cwd(), "assets/fonts/Geist-SemiBold.ttf")
 )
