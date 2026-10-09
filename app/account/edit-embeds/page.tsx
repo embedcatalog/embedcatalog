@@ -62,13 +62,7 @@ function EditEmbedsForm() {
   }, [loading, router, user])
 
   React.useEffect(() => {
-    if (!user) return
-
-    if (!projectId) {
-      setFetchError("Missing project id.")
-      setFetching(false)
-      return
-    }
+    if (!user || !projectId) return
 
     let cancelled = false
 
@@ -131,7 +125,31 @@ function EditEmbedsForm() {
     }
   }, [projectId, user, isAdmin])
 
-  if (loading || !user || fetching) {
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-[70svh] items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (!projectId) {
+    return (
+      <main className="site-container py-8 sm:py-12">
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/account/projects">
+            <ChevronLeft className="size-4" />
+            My projects
+          </Link>
+        </Button>
+        <p className="mt-6 text-sm text-destructive" role="alert">
+          Missing project id.
+        </p>
+      </main>
+    )
+  }
+
+  if (fetching) {
     return (
       <div className="flex min-h-[70svh] items-center justify-center">
         <Loader2 className="size-6 animate-spin text-muted-foreground" />

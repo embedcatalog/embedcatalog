@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import { Button } from "components/ui/button"
 import { ProjectDetail } from "components/project-detail"
@@ -33,23 +34,16 @@ function NotFoundMessage() {
 }
 
 function NotFound() {
+  const pathname = usePathname()
+  const match = pathname.match(/^\/projects\/([^/]+)\/?$/)
+  const slug = match ? decodeURIComponent(match[1]) : null
   const [project, setProject] = React.useState<Project | null>(null)
   const [customEmbeds, setCustomEmbeds] = React.useState<CustomEmbed[]>([])
   const [loading, setLoading] = React.useState(true)
-  const [isProjectPath, setIsProjectPath] = React.useState(false)
 
   React.useEffect(() => {
-    const path = window.location.pathname
-    const match = path.match(/^\/projects\/([^/]+)\/?$/)
-
-    if (!match) {
-      setIsProjectPath(false)
-      setLoading(false)
-      return
-    }
-
-    setIsProjectPath(true)
-    const slug = decodeURIComponent(match[1])
+    if (!slug) return
+    const projectSlug = slug
     let cancelled = false
 
     async function loadProject() {
@@ -58,7 +52,7 @@ function NotFound() {
         .select(
           "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
         )
-        .eq("slug", slug)
+        .eq("slug", projectSlug)
         .eq("status", "published")
         .maybeSingle()
 
@@ -118,9 +112,9 @@ function NotFound() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [slug])
 
-  if (isProjectPath && loading) {
+  if (slug && loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted-foreground">
         Loading project...
@@ -128,7 +122,7 @@ function NotFound() {
     )
   }
 
-  if (isProjectPath && project) {
+  if (slug && project) {
     return <ProjectDetail project={project} customEmbeds={customEmbeds} />
   }
 

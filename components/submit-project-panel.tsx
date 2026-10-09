@@ -28,18 +28,20 @@ const statusLabel: Record<ProjectStatus, string> = {
 function SubmitProjectPanel() {
   const { user, loading } = useAuth()
   const [projects, setProjects] = React.useState<Project[]>([])
-  const [projectsLoading, setProjectsLoading] = React.useState(false)
+  const [projectsLoadedFor, setProjectsLoadedFor] = React.useState<
+    string | null
+  >(null)
   const [projectsError, setProjectsError] = React.useState<string | null>(null)
   const [expandedId, setExpandedId] = React.useState<string | null>(null)
   const [comments, setComments] = React.useState<Record<string, string>>({})
   const [submittingId, setSubmittingId] = React.useState<string | null>(null)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const projectsLoading = Boolean(user && projectsLoadedFor !== user.id)
 
   React.useEffect(() => {
     if (!user) return
 
     let cancelled = false
-    setProjectsLoading(true)
 
     supabase
       .from("projects")
@@ -51,9 +53,10 @@ function SubmitProjectPanel() {
         if (error) {
           setProjectsError(error.message)
         } else {
+          setProjectsError(null)
           setProjects(data)
         }
-        setProjectsLoading(false)
+        setProjectsLoadedFor(user.id)
       })
 
     return () => {
