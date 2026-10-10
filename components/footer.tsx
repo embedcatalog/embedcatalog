@@ -1,6 +1,7 @@
 import * as React from "react"
 import Link from "next/link"
 
+import { NewsletterSubscription } from "components/newsletter-subscription"
 import { siteConfig } from "lib/site"
 
 function GithubIcon(props: React.ComponentProps<"svg">) {
@@ -63,31 +64,37 @@ function Footer() {
   return (
     <footer className="border-t bg-background">
       <div className="site-container py-12">
-        <div className="flex flex-col gap-8 sm:flex-row">
-          <div>
-            <Link href="/" className="flex items-center font-semibold">
-              <span>{siteConfig.name}</span>
-            </Link>
-            <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              {siteConfig.slogan}
-            </p>
+        <div className="flex flex-col justify-between gap-10 lg:flex-row lg:items-start">
+          <div className="flex flex-col gap-8 sm:flex-row sm:gap-16">
+            <div>
+              <Link href="/" className="flex items-center font-semibold">
+                <span>{siteConfig.name}</span>
+              </Link>
+              <p className="mt-3 max-w-xs text-sm text-muted-foreground">
+                {siteConfig.slogan}
+              </p>
+            </div>
+
+            <nav>
+              <h3 className="text-sm font-medium">Pages</h3>
+              <ul className="mt-3 space-y-2">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
 
-          <nav>
-            <h3 className="text-sm font-medium">Pages</h3>
-            <ul className="mt-3 space-y-2">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <div className="w-full max-w-sm">
+            <NewsletterSubscription variant="footer" />
+          </div>
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t pt-6 sm:flex-row">
