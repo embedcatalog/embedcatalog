@@ -9,6 +9,7 @@ import { Footer } from "components/footer"
 import { HacktoberfestBanner } from "components/hacktoberfest-banner"
 import { GithubStars } from "components/github-stars"
 import { NotificationProvider } from "components/notification-provider"
+import { ScrollToTopButton } from "components/scroll-to-top-button"
 import { siteConfig } from "lib/site"
 
 const SITE_NAME = siteConfig.name
@@ -91,6 +92,7 @@ export default function RootLayout({
                 <Header githubSlot={<GithubStars />} />
                 <div className="flex-1">{children}</div>
                 <Footer />
+                <ScrollToTopButton />
               </div>
             </NotificationProvider>
           </AuthProvider>
