@@ -30,6 +30,8 @@ import { getPublicStandaloneEmbedSrc } from "lib/embed"
 import { siteConfig } from "lib/site"
 import type { StandaloneEmbedTheme } from "lib/standalone-embed-image"
 import { supabase } from "lib/supabase/client"
+import { cn } from "lib/utils"
+import { ProjectsGrid, type Project } from "components/projects-grid"
 
 type PublicEmbed = Pick<
   Database["public"]["Tables"]["standalone_embeds"]["Row"],
@@ -279,6 +281,8 @@ function PublicUserEmbeds({ login }: { login: string }) {
   const [profile, setProfile] = React.useState<PublicProfile | null>(null)
   const [bio, setBio] = React.useState("")
   const [embeds, setEmbeds] = React.useState<PublicEmbed[]>([])
+  const [projects, setProjects] = React.useState<Project[]>([])
+  const [activeTab, setActiveTab] = React.useState<"embeds" | "projects">("embeds")
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
 
@@ -306,20 +310,59 @@ function PublicUserEmbeds({ login }: { login: string }) {
       if (cancelled) return
       setBio(bioData ?? "")
 
-      const { data, error: embedsError } = await supabase
-        .from("standalone_embeds")
-        .select(
-          "id, slug, title, description, created_at, views_count, upvotes_count"
-        )
-        .eq("owner_id", profile.id)
-        .eq("status", "approved")
-        .order("created_at", { ascending: false })
+      const [embedsResult, projectsResult] = await Promise.all([
+        supabase
+          .from("standalone_embeds")
+          .select(
+            "id, slug, title, description, created_at, views_count, upvotes_count"
+          )
+          .eq("owner_id", profile.id)
+          .eq("status", "approved")
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("projects")
+          .select(
+            "id, owner_id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, created_at, impressions_count, upvotes_count, info, socials, is_premium"
+          )
+          .eq("owner_id", profile.id)
+          .eq("status", "published")
+          .order("created_at", { ascending: false }),
+      ])
 
       if (cancelled) return
-      if (embedsError) {
+      if (embedsResult.error) {
         setError("Could not load this profile's embeds.")
       } else {
-        setEmbeds(data ?? [])
+        setEmbeds(embedsResult.data ?? [])
+      }
+      if (!projectsResult.error) {
+        setProjects(
+          (projectsResult.data ?? []).map((project) => ({
+            id: project.id,
+            ownerId: project.owner_id,
+            slug: project.slug,
+            name: project.name,
+            description: project.description,
+            isNew: false,
+            premium: project.is_premium,
+            url: project.url,
+            githubUrl: project.github_url ?? undefined,
+            githubStats: {
+              stars: project.github_stars,
+              forks: project.github_forks,
+              contributors: project.github_contributors,
+              license: project.github_license,
+              updatedAt: project.github_stats_updated_at,
+            },
+            images: project.images ?? [],
+            tags: project.tags ?? [],
+            createdAt: project.created_at,
+            impressionsCount: project.impressions_count,
+            upvotesCount: project.upvotes_count,
+            info: typeof project.info === "string" ? project.info : undefined,
+            socials: project.socials ?? undefined,
+          }))
+        )
       }
       setLoading(false)
     }
@@ -433,24 +476,49 @@ function PublicUserEmbeds({ login }: { login: string }) {
           <nav
             role="tablist"
             aria-label="Profile sections"
-            className="mt-5 flex border-b"
+            className="mt-5 flex gap-5 border-b"
           >
             <button
               id="profile-embeds-tab"
               type="button"
               role="tab"
-              aria-selected="true"
+              aria-selected={activeTab === "embeds"}
               aria-controls="profile-embeds-panel"
-              className="flex items-center gap-2 border-b-2 border-foreground px-1 pb-3 text-sm font-medium"
+              onClick={() => setActiveTab("embeds")}
+              className={cn(
+                "flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-medium",
+                activeTab === "embeds"
+                  ? "border-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
             >
               Embeds
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
                 {embeds.length}
               </span>
             </button>
+            <button
+              id="profile-projects-tab"
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "projects"}
+              aria-controls="profile-projects-panel"
+              onClick={() => setActiveTab("projects")}
+              className={cn(
+                "flex items-center gap-2 border-b-2 px-1 pb-3 text-sm font-medium",
+                activeTab === "projects"
+                  ? "border-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              )}
+            >
+              Projects
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                {projects.length}
+              </span>
+            </button>
           </nav>
 
-          {embeds.length === 0 ? (
+          {activeTab === "embeds" && (embeds.length === 0 ? (
             <Card
               id="profile-embeds-panel"
               role="tabpanel"
@@ -479,6 +547,17 @@ function PublicUserEmbeds({ login }: { login: string }) {
                   embed={embed}
                 />
               ))}
+            </section>
+          )}
+
+          {activeTab === "projects" && (
+            <section
+              id="profile-projects-panel"
+              role="tabpanel"
+              aria-labelledby="profile-projects-tab"
+              className="mt-6"
+            >
+              <ProjectsGrid projects={projects} />
             </section>
           )}
         </>
