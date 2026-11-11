@@ -215,6 +215,7 @@ export type Database = {
           description: string
           url: string
           github_url: string | null
+          categories: string[] | null
           tags: string[] | null
           socials: Record<string, string> | null
           images: string[] | null
@@ -232,6 +233,7 @@ export type Database = {
           description: string
           url: string
           github_url?: string | null
+          categories?: string[] | null
           tags?: string[] | null
           socials?: Record<string, string> | null
           images?: string[] | null
@@ -289,6 +291,7 @@ export type Database = {
           github_contributors: number | null
           github_license: string | null
           github_stats_updated_at: string | null
+          categories: string[] | null
           tags: string[] | null
           socials: Record<string, string> | null
           images: string[] | null
@@ -314,6 +317,7 @@ export type Database = {
           github_contributors?: number | null
           github_license?: string | null
           github_stats_updated_at?: string | null
+          categories?: string[] | null
           tags?: string[] | null
           socials?: Record<string, string> | null
           images?: string[] | null
@@ -339,6 +343,7 @@ export type Database = {
           github_contributors?: number | null
           github_license?: string | null
           github_stats_updated_at?: string | null
+          categories?: string[] | null
           tags?: string[] | null
           socials?: Record<string, string> | null
           images?: string[] | null

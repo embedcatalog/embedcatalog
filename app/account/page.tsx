@@ -214,7 +214,7 @@ function AccountPage({
       const { data, error } = await supabase
         .from("projects")
         .select(
-          "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, is_premium, impressions_count, upvotes_count, created_at"
+          "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, categories, images, tags, socials, is_premium, impressions_count, upvotes_count, created_at"
         )
         .in("id", projectIds)
         .eq("status", "published")
@@ -242,6 +242,7 @@ function AccountPage({
               updatedAt: project.github_stats_updated_at,
             },
             images: (project.images ?? []).map(getProjectImageUrl),
+            categories: project.categories,
             tags: project.tags ?? [],
             createdAt: project.created_at,
             impressionsCount: project.impressions_count,

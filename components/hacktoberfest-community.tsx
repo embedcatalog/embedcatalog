@@ -5,15 +5,9 @@ import Image from "next/image"
 import { Check, Copy, Loader2 } from "lucide-react"
 
 import { siteConfig } from "lib/site"
-import {
-  getContributors,
-  getOpenIssues,
-  type GithubContributor,
-  type GithubIssue,
-} from "lib/hacktoberfest"
+import { getContributors, type GithubContributor } from "lib/hacktoberfest"
 
 function HacktoberfestCommunity() {
-  const [issues, setIssues] = React.useState<GithubIssue[]>([])
   const [contributors, setContributors] = React.useState<GithubContributor[]>(
     []
   )
@@ -23,14 +17,11 @@ function HacktoberfestCommunity() {
   React.useEffect(() => {
     let cancelled = false
 
-    Promise.all([getOpenIssues(), getContributors()]).then(
-      ([loadedIssues, loadedContributors]) => {
-        if (cancelled) return
-        setIssues(loadedIssues)
-        setContributors(loadedContributors)
-        setLoading(false)
-      }
-    )
+    getContributors().then((loadedContributors) => {
+      if (cancelled) return
+      setContributors(loadedContributors)
+      setLoading(false)
+    })
 
     return () => {
       cancelled = true
@@ -60,52 +51,20 @@ function HacktoberfestCommunity() {
 
   return (
     <>
-      <section className="mt-10">
-        <h2 className="text-lg font-semibold">Open issues</h2>
-        {issues.length > 0 ? (
-          <ul className="mt-4 divide-y rounded-lg border">
-            {issues.map((issue) => (
-              <li key={issue.id}>
-                <a
-                  href={issue.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex flex-col gap-2 p-4 transition-colors hover:bg-accent"
-                >
-                  <span className="text-sm font-medium">
-                    {issue.title}{" "}
-                    <span className="font-normal text-muted-foreground">
-                      #{issue.number}
-                    </span>
-                  </span>
-                  <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span>by {issue.author}</span>
-                    <span>{issue.comments} comments</span>
-                    {issue.labels.map((label) => (
-                      <span
-                        key={label.name}
-                        className="rounded-full border px-2 py-0.5"
-                        style={{ borderColor: `#${label.color}` }}
-                      >
-                        {label.name}
-                      </span>
-                    ))}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-4 text-sm text-muted-foreground">
-            No open issues right now.
-          </p>
-        )}
+      <section className="mt-10 rounded-lg border p-6 text-center">
+        <h2 className="text-lg font-semibold">
+          Hacktoberfest 2026 has wrapped up
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Thank you to everyone who contributed to EmbedCatalog and helped grow
+          open source.
+        </p>
       </section>
 
       <section className="mt-10">
         <h2 className="text-lg font-semibold">Contributors</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Get your unique Hacktoberfest 2026 embed.
+          Meet the contributors and visit their GitHub profiles.
         </p>
         {contributors.length > 0 ? (
           <ul className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-6">

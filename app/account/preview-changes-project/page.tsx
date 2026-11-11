@@ -32,6 +32,7 @@ type PendingProject = {
   description: string
   url: string
   github_url: string | null
+  categories: string[] | null
   tags: string[] | null
   socials: Record<string, string> | null
   images: string[] | null
@@ -62,7 +63,7 @@ function PreviewChangesProjectContent() {
     supabase
       .from("project_edit_requests")
       .select(
-        "id, project_id, name, description, url, github_url, tags, socials, images, info, embeds, created_at"
+        "id, project_id, name, description, url, github_url, categories, tags, socials, images, info, embeds, created_at"
       )
       .eq("id", requestId)
       .eq("status", "pending")
@@ -151,6 +152,11 @@ function PreviewChangesProjectContent() {
               >
                 {request.url}
               </a>
+              {request.categories && request.categories.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Categories: {request.categories.join(", ")}
+                </p>
+              )}
               {request.tags && request.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {request.tags.map((tag) => (

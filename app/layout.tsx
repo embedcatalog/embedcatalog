@@ -6,7 +6,6 @@ import { ThemeProvider } from "components/theme-provider"
 import { AuthProvider } from "components/auth-provider"
 import { Header } from "components/header"
 import { Footer } from "components/footer"
-import { HacktoberfestBanner } from "components/hacktoberfest-banner"
 import { GithubStars } from "components/github-stars"
 import { NotificationProvider } from "components/notification-provider"
 import { ScrollToTop } from "components/scroll-to-top"
@@ -88,7 +87,6 @@ export default function RootLayout({
           <AuthProvider>
             <NotificationProvider>
               <div className="flex min-h-svh flex-col">
-                <HacktoberfestBanner />
                 <Header githubSlot={<GithubStars />} />
                 <div className="flex-1">{children}</div>
                 <Footer />

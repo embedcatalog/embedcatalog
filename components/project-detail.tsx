@@ -154,6 +154,23 @@ function ProjectDetail({
         />
         <p className="mt-6 leading-relaxed">{project.description}</p>
 
+        {project.categories && project.categories.length > 0 && (
+          <div className="mt-6">
+            <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Categories
+            </h2>
+            <div className="flex flex-wrap gap-1.5">
+              {project.categories.map((category) => (
+                <Embed key={category} variant="secondary" asChild>
+                  <Link href={`/?category=${encodeURIComponent(category)}`}>
+                    {category}
+                  </Link>
+                </Embed>
+              ))}
+            </div>
+          </div>
+        )}
+
         <ProjectInfoMarkdown content={project.info} />
 
         <div className="mt-6">

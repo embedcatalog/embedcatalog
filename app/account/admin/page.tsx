@@ -42,6 +42,7 @@ type ProjectEditRequest = {
   name: string
   description: string
   url: string
+  categories: string[] | null
   tags: string[] | null
   created_at: string
 }
@@ -315,7 +316,7 @@ function AdminPage() {
     let cancelled = false
     supabase
       .from("project_edit_requests")
-      .select("id, project_id, name, description, url, tags, created_at")
+      .select("id, project_id, name, description, url, categories, tags, created_at")
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
@@ -713,6 +714,11 @@ function AdminPage() {
                         <p className="mt-2 text-sm text-muted-foreground">
                           {request.description}
                         </p>
+                        {request.categories && request.categories.length > 0 && (
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            Categories: {request.categories.join(", ")}
+                          </p>
+                        )}
                         {request.tags && request.tags.length > 0 && (
                           <p className="mt-2 text-xs text-muted-foreground">
                             Tags: {request.tags.join(", ")}

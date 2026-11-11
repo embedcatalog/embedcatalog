@@ -322,7 +322,7 @@ function PublicUserEmbeds({ login }: { login: string }) {
         supabase
           .from("projects")
           .select(
-            "id, owner_id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, created_at, impressions_count, upvotes_count, info, socials, is_premium"
+            "id, owner_id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, categories, images, tags, created_at, impressions_count, upvotes_count, info, socials, is_premium"
           )
           .eq("owner_id", profile.id)
           .eq("status", "published")
@@ -355,6 +355,7 @@ function PublicUserEmbeds({ login }: { login: string }) {
               updatedAt: project.github_stats_updated_at,
             },
             images: project.images ?? [],
+            categories: project.categories,
             tags: project.tags ?? [],
             createdAt: project.created_at,
             impressionsCount: project.impressions_count,
@@ -548,7 +549,7 @@ function PublicUserEmbeds({ login }: { login: string }) {
                 />
               ))}
             </section>
-          )}
+          ))}
 
           {activeTab === "projects" && (
             <section

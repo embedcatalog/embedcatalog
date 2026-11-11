@@ -13,10 +13,32 @@ function SkeletonBlock({ className }: { className: string }) {
   return <div className={`animate-pulse rounded-md bg-muted ${className}`} />
 }
 
-function ProjectsSkeleton() {
+function ProjectsSkeleton({
+  hero,
+  sidebar,
+  centerScrollRef,
+  leftSidebarRef,
+  rightSidebarRef,
+}: {
+  hero?: React.ReactNode
+  sidebar?: React.ReactNode
+  centerScrollRef: React.RefObject<HTMLDivElement | null>
+  leftSidebarRef: React.RefObject<HTMLElement | null>
+  rightSidebarRef: React.RefObject<HTMLDivElement | null>
+}) {
   return (
-    <div className="grid gap-6 md:grid-cols-[220px_1fr]" aria-busy="true">
-      <aside className="flex flex-col gap-6">
+    <div
+      className={
+        sidebar
+          ? "grid gap-6 md:grid-cols-[220px_1fr] lg:h-full lg:min-h-0 lg:grid-cols-[220px_minmax(0,1fr)_280px] lg:grid-rows-[minmax(0,1fr)]"
+          : "grid gap-6 md:grid-cols-[220px_1fr] lg:h-full lg:min-h-0 lg:grid-rows-[minmax(0,1fr)]"
+      }
+      aria-busy="true"
+    >
+      <aside
+        ref={leftSidebarRef}
+        className="flex flex-col gap-6 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+      >
         <div className="flex items-center justify-between">
           <SkeletonBlock className="h-4 w-16" />
           <SkeletonBlock className="h-3 w-10" />
@@ -36,7 +58,11 @@ function ProjectsSkeleton() {
         </div>
       </aside>
 
-      <div className="flex flex-col gap-4">
+      <div
+        ref={centerScrollRef}
+        className="flex flex-col gap-4 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain"
+      >
+        {hero}
         <div className="flex items-center gap-2">
           <SkeletonBlock className="h-10 w-full max-w-sm" />
           <SkeletonBlock className="h-9 w-[150px] shrink-0" />
@@ -66,6 +92,15 @@ function ProjectsSkeleton() {
           ))}
         </div>
       </div>
+
+      {sidebar && (
+        <div
+          ref={rightSidebarRef}
+          className="md:col-span-2 lg:col-span-1 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+        >
+          {sidebar}
+        </div>
+      )}
     </div>
   )
 }
@@ -82,6 +117,7 @@ function mapProject(project: {
   github_contributors: number | null
   github_license: string | null
   github_stats_updated_at: string | null
+  categories: string[] | null
   images: string[] | null
   tags: string[] | null
   socials: Record<string, string> | null
@@ -110,6 +146,7 @@ function mapProject(project: {
       updatedAt: project.github_stats_updated_at,
     },
     images: (project.images ?? []).map(getProjectImageUrl),
+    categories: project.categories,
     tags: project.tags ?? [],
     createdAt: project.created_at,
     impressionsCount: project.impressions_count,
@@ -119,9 +156,64 @@ function mapProject(project: {
   }
 }
 
-function ProjectsPage() {
+function ProjectsPage({
+  hero,
+  sidebar,
+}: {
+  hero?: React.ReactNode
+  sidebar?: React.ReactNode
+}) {
+  const centerScrollRef = React.useRef<HTMLDivElement>(null)
+  const leftSidebarRef = React.useRef<HTMLElement>(null)
+  const rightSidebarRef = React.useRef<HTMLDivElement>(null)
   const [projects, setProjects] = React.useState<Project[]>([])
   const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    function handleWheel(event: WheelEvent) {
+      if (!window.matchMedia("(min-width: 64rem)").matches || event.deltaY === 0) {
+        return
+      }
+
+      const sidebarElement = event.currentTarget as HTMLElement
+      const canScroll = (element: HTMLElement) => {
+        const maxScroll = element.scrollHeight - element.clientHeight
+        return event.deltaY > 0
+          ? element.scrollTop < maxScroll
+          : element.scrollTop > 0
+      }
+
+      let element = event.target instanceof HTMLElement ? event.target : null
+      while (element && element !== sidebarElement) {
+        const overflowY = window.getComputedStyle(element).overflowY
+        if (
+          (overflowY === "auto" || overflowY === "scroll") &&
+          canScroll(element)
+        ) {
+          return
+        }
+        element = element.parentElement
+      }
+
+      if (canScroll(sidebarElement)) return
+
+      event.preventDefault()
+      if (centerScrollRef.current) {
+        centerScrollRef.current.scrollTop += event.deltaY
+      }
+    }
+
+    const sidebars = [leftSidebarRef.current, rightSidebarRef.current]
+    for (const sidebarElement of sidebars) {
+      sidebarElement?.addEventListener("wheel", handleWheel, { passive: false })
+    }
+
+    return () => {
+      for (const sidebarElement of sidebars) {
+        sidebarElement?.removeEventListener("wheel", handleWheel)
+      }
+    }
+  }, [loading])
 
   React.useEffect(() => {
     let cancelled = false
@@ -129,7 +221,7 @@ function ProjectsPage() {
     supabase
       .from("projects")
       .select(
-        "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
+        "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, categories, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
       )
       .eq("status", "published")
       .order("created_at", { ascending: false })
@@ -144,20 +236,41 @@ function ProjectsPage() {
     }
   }, [])
 
-  return (
+  const centerHeader = (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold">
           Projects{" "}
           {!loading && (
             <span className="font-normal text-muted-foreground">
               ({projects.length})
             </span>
           )}
-        </h1>
+        </h2>
       </div>
-      {loading ? <ProjectsSkeleton /> : <ProjectsView projects={projects} />}
+      {hero}
     </>
+  )
+
+  return (
+    loading ? (
+      <ProjectsSkeleton
+        hero={centerHeader}
+        sidebar={sidebar}
+        centerScrollRef={centerScrollRef}
+        leftSidebarRef={leftSidebarRef}
+        rightSidebarRef={rightSidebarRef}
+      />
+    ) : (
+      <ProjectsView
+        projects={projects}
+        hero={centerHeader}
+        sidebar={sidebar}
+        centerScrollRef={centerScrollRef}
+        leftSidebarRef={leftSidebarRef}
+        rightSidebarRef={rightSidebarRef}
+      />
+    )
   )
 }
 

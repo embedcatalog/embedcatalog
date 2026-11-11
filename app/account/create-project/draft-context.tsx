@@ -16,6 +16,7 @@ export type CreateProjectDraft = {
   title: string
   projectUrl: string
   shortDescription: string
+  categoriesInput: string
   tagsInput: string
   twitterUrl: string
   youtubeUrl: string
@@ -41,6 +42,7 @@ function CreateProjectDraftProvider({
     title: "",
     projectUrl: "https://example.com",
     shortDescription: "",
+    categoriesInput: "",
     tagsInput: "",
     twitterUrl: "",
     youtubeUrl: "",

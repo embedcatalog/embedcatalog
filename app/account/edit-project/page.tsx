@@ -21,6 +21,10 @@ import { Label } from "components/ui/label"
 import { Textarea } from "components/ui/textarea"
 import { ProjectInfoMarkdown } from "components/project-info-markdown"
 import { supabase } from "lib/supabase/client"
+import {
+  MAX_PROJECT_CATEGORIES,
+  parseProjectCategories,
+} from "lib/project-categories"
 
 type Embed = {
   id: number
@@ -38,6 +42,7 @@ function EditProjectForm() {
   const [title, setTitle] = React.useState("")
   const [projectUrl, setProjectUrl] = React.useState("")
   const [shortDescription, setShortDescription] = React.useState("")
+  const [categoriesInput, setCategoriesInput] = React.useState("")
   const [tagsInput, setTagsInput] = React.useState("")
   const [images, setImages] = React.useState<string[]>([])
   const [imageFiles, setImageFiles] = React.useState<File[]>([])
@@ -69,7 +74,7 @@ function EditProjectForm() {
       let query = supabase
         .from("projects")
         .select(
-          "id, owner_id, name, description, url, github_url, tags, socials, images, info, status"
+          "id, owner_id, name, description, url, github_url, categories, tags, socials, images, info, status"
         )
         .eq("id", projectId as string)
 
@@ -101,6 +106,7 @@ function EditProjectForm() {
       setTitle(project.name)
       setShortDescription(project.description)
       setProjectUrl(project.url)
+      setCategoriesInput((project.categories ?? []).join(", "))
       setTagsInput((project.tags ?? []).join(", "))
       setImages(project.images ?? [])
       setInfoInput(typeof project.info === "string" ? project.info : "")
@@ -202,6 +208,7 @@ function EditProjectForm() {
     const name = title.trim()
     const description = shortDescription.trim()
     const url = projectUrl.trim()
+    const categories = parseProjectCategories(categoriesInput)
     const tags = tagsInput
       .split(",")
       .map((tag) => tag.trim())
@@ -212,6 +219,10 @@ function EditProjectForm() {
     if (githubUrl.trim()) socials.github = githubUrl.trim()
     if (!name || !description || !url) {
       setSaveError("Enter a title, short description, and valid URL.")
+      return
+    }
+    if (categories.length > MAX_PROJECT_CATEGORIES) {
+      setSaveError(`Choose no more than ${MAX_PROJECT_CATEGORIES} categories.`)
       return
     }
 
@@ -264,6 +275,7 @@ function EditProjectForm() {
           description,
           url,
           github_url: socials.github ?? null,
+          categories: categories.length ? categories : null,
           tags: tags.length ? tags : null,
           socials: Object.keys(socials).length ? socials : null,
           images: nextImages.length ? nextImages : null,
@@ -290,6 +302,7 @@ function EditProjectForm() {
         description,
         url,
         github_url: socials.github ?? null,
+        categories: categories.length ? categories : null,
         tags: tags.length ? tags : null,
         socials: Object.keys(socials).length ? socials : null,
         images: nextImages.length ? nextImages : null,
@@ -352,6 +365,19 @@ function EditProjectForm() {
                     placeholder="My project"
                     maxLength={80}
                   />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="project-categories">Categories</Label>
+                  <Input
+                    id="project-categories"
+                    value={categoriesInput}
+                    onChange={(event) => setCategoriesInput(event.target.value)}
+                    placeholder="Developer tools, Productivity"
+                    maxLength={224}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Comma-separated list, up to {MAX_PROJECT_CATEGORIES}.
+                  </p>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="project-tags">Tags</Label>

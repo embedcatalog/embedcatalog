@@ -65,7 +65,12 @@ export async function generateMetadata({
   return {
     title: project.name,
     description: project.description,
-    keywords: [project.name, ...project.tags, "project"],
+    keywords: [
+      project.name,
+      ...(project.categories ?? []),
+      ...project.tags,
+      "project",
+    ],
     alternates: { canonical },
     openGraph: {
       type: "article",

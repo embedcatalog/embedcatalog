@@ -50,7 +50,7 @@ function NotFound() {
       const { data, error } = await supabase
         .from("projects")
         .select(
-          "id, owner_id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
+          "id, owner_id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, categories, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
         )
         .eq("slug", projectSlug)
         .eq("status", "published")
@@ -82,6 +82,7 @@ function NotFound() {
           updatedAt: data.github_stats_updated_at,
         },
         images: (data.images ?? []).map(getProjectImageUrl),
+        categories: data.categories,
         tags: data.tags ?? [],
         createdAt: data.created_at,
         impressionsCount: data.impressions_count,

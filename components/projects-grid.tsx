@@ -71,6 +71,7 @@ export type Project = {
   githubUrl?: string
   githubStats?: ProjectGithubStatsData
   images: string[]
+  categories?: string[] | null
   tags: string[]
   createdAt: string
   impressionsCount: number
@@ -82,9 +83,11 @@ export type Project = {
 function ProjectsGrid({
   projects,
   onTagClick,
+  onCategoryClick,
 }: {
   projects: Project[]
   onTagClick?: (tag: string) => void
+  onCategoryClick?: (category: string) => void
 }) {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
@@ -222,6 +225,33 @@ function ProjectsGrid({
                 <span>{project.name}</span>
               </CardTitle>
               <CardDescription>{project.description}</CardDescription>
+              {project.categories && project.categories.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {project.categories.map((category) => (
+                    <React.Fragment key={category}>
+                      {onCategoryClick ? (
+                        <Embed variant="secondary" asChild>
+                          <button
+                            type="button"
+                            onClick={() => onCategoryClick(category)}
+                            className="relative z-10 cursor-pointer"
+                          >
+                            {category}
+                          </button>
+                        </Embed>
+                      ) : (
+                        <Embed variant="secondary" asChild>
+                          <Link
+                            href={`/?category=${encodeURIComponent(category)}`}
+                          >
+                            {category}
+                          </Link>
+                        </Embed>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
               <CardAction className="relative z-10 flex items-center gap-2">
                 <button
                   type="button"

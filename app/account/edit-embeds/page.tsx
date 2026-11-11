@@ -199,7 +199,7 @@ function EditEmbedsForm() {
       const { data: project, error: projectError } = await supabase
         .from("projects")
         .select(
-          "name, description, url, github_url, tags, socials, images, info"
+          "name, description, url, github_url, categories, tags, socials, images, info"
         )
         .eq("id", projectId as string)
         .single()

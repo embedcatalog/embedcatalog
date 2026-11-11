@@ -1,16 +1,5 @@
 const REPO = "embedcatalog/embedcatalog"
 
-export type GithubIssue = {
-  id: number
-  number: number
-  title: string
-  url: string
-  createdAt: string
-  comments: number
-  labels: { name: string; color: string }[]
-  author: string
-}
-
 export type GithubContributor = {
   login: string
   avatarUrl: string
@@ -35,39 +24,6 @@ async function githubFetch<T>(path: string): Promise<T | null> {
   }
 }
 
-async function getOpenIssues(): Promise<GithubIssue[]> {
-  const data = await githubFetch<
-    {
-      id: number
-      number: number
-      title: string
-      html_url: string
-      created_at: string
-      comments: number
-      labels: ({ name?: string; color?: string } | string)[]
-      user: { login: string } | null
-      pull_request?: unknown
-    }[]
-  >("/issues?state=open&per_page=100")
-
-  return (data ?? [])
-    .filter((issue) => !issue.pull_request)
-    .map((issue) => ({
-      id: issue.id,
-      number: issue.number,
-      title: issue.title,
-      url: issue.html_url,
-      createdAt: issue.created_at,
-      comments: issue.comments,
-      labels: issue.labels.flatMap((label) =>
-        typeof label === "string" || !label.name
-          ? []
-          : [{ name: label.name, color: label.color ?? "888888" }]
-      ),
-      author: issue.user?.login ?? "ghost",
-    }))
-}
-
 async function getContributors(): Promise<GithubContributor[]> {
   const data = await githubFetch<
     {
@@ -89,4 +45,4 @@ async function getContributors(): Promise<GithubContributor[]> {
     }))
 }
 
-export { getOpenIssues, getContributors }
+export { getContributors }

@@ -59,7 +59,7 @@ export default function PrivacyPage() {
             </li>
             <li>
               Project information you submit, including a project name,
-              description, URL, tags, social links, images, embed content,
+              description, URL, categories, tags, social links, images, embed content,
               moderation comments, and publication status.
             </li>
             <li>

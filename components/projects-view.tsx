@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { Search, X } from "lucide-react"
+import { Compass, Search, X } from "lucide-react"
 
 import { Input } from "components/ui/input"
 import {
@@ -24,9 +24,19 @@ function parseTagsParam(value: string | null) {
 function ProjectsView({
   projects,
   showFilters = true,
+  hero,
+  sidebar,
+  centerScrollRef,
+  leftSidebarRef,
+  rightSidebarRef,
 }: {
   projects: Project[]
   showFilters?: boolean
+  hero?: React.ReactNode
+  sidebar?: React.ReactNode
+  centerScrollRef: React.RefObject<HTMLDivElement | null>
+  leftSidebarRef: React.RefObject<HTMLElement | null>
+  rightSidebarRef: React.RefObject<HTMLDivElement | null>
 }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -37,6 +47,9 @@ function ProjectsView({
   )
   const [premiumOnly, setPremiumOnly] = React.useState(
     () => searchParams.get("premium") === "1"
+  )
+  const [selectedCategory, setSelectedCategory] = React.useState(
+    () => searchParams.get("category") ?? ""
   )
   const [selectedTags, setSelectedTags] = React.useState<string[]>(() =>
     parseTagsParam(searchParams.get("tags"))
@@ -55,6 +68,7 @@ function ProjectsView({
     if (query) params.set("q", query)
     if (newOnly) params.set("status", "new")
     if (premiumOnly) params.set("premium", "1")
+    if (selectedCategory) params.set("category", selectedCategory)
     if (selectedTags.length > 0) params.set("tags", selectedTags.join(","))
     if (sort !== "desc") params.set("sort", sort)
 
@@ -68,8 +82,23 @@ function ProjectsView({
       "",
       queryString ? `${pathname}?${queryString}` : pathname
     )
-  }, [query, newOnly, premiumOnly, selectedTags, sort, pathname])
+  }, [query, newOnly, premiumOnly, selectedCategory, selectedTags, sort, pathname])
 
+  const categories = React.useMemo(() => {
+    const categoriesByName = new Map<string, string>()
+    for (const project of projects) {
+      for (const category of project.categories ?? []) {
+        const value = category.trim()
+        const key = value.toLowerCase()
+        if (value && !categoriesByName.has(key)) {
+          categoriesByName.set(key, value)
+        }
+      }
+    }
+    return Array.from(categoriesByName.values()).sort((a, b) =>
+      a.localeCompare(b)
+    )
+  }, [projects])
   const allTags = React.useMemo(() => {
     const tags = new Set<string>()
     for (const project of projects) {
@@ -94,15 +123,37 @@ function ProjectsView({
         !normalizedQuery ||
         project.name.toLowerCase().includes(normalizedQuery) ||
         project.description.toLowerCase().includes(normalizedQuery) ||
+        (project.categories ?? []).some((category) =>
+          category.toLowerCase().includes(normalizedQuery)
+        ) ||
         project.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery))
       const matchesNew = !newOnly || project.isNew
       const matchesPremium = !premiumOnly || project.premium
+      const matchesCategory =
+        !selectedCategory ||
+        (project.categories ?? []).some(
+          (category) =>
+            category.toLowerCase() === selectedCategory.toLowerCase()
+        )
       const matchesTags =
         selectedTags.length === 0 ||
         selectedTags.some((tag) => project.tags.includes(tag))
-      return matchesQuery && matchesNew && matchesPremium && matchesTags
+      return (
+        matchesQuery &&
+        matchesNew &&
+        matchesPremium &&
+        matchesCategory &&
+        matchesTags
+      )
     })
-  }, [projects, normalizedQuery, newOnly, premiumOnly, selectedTags])
+  }, [
+    projects,
+    normalizedQuery,
+    newOnly,
+    premiumOnly,
+    selectedCategory,
+    selectedTags,
+  ])
 
   const sorted = React.useMemo(() => {
     return [...filtered].sort((a, b) => {
@@ -127,22 +178,37 @@ function ProjectsView({
     setQuery("")
     setNewOnly(false)
     setPremiumOnly(false)
+    setSelectedCategory("")
     setSelectedTags([])
   }
 
   const hasActiveFilters =
-    query !== "" || newOnly || premiumOnly || selectedTags.length > 0
+    query !== "" ||
+    newOnly ||
+    premiumOnly ||
+    selectedCategory !== "" ||
+    selectedTags.length > 0
 
   return (
     <div
       className={
-        showFilters ? "grid gap-6 md:grid-cols-[220px_1fr]" : "flex flex-col"
+        showFilters
+          ? sidebar
+            ? "grid gap-6 md:grid-cols-[220px_1fr] lg:h-full lg:min-h-0 lg:grid-cols-[220px_minmax(0,1fr)_280px] lg:grid-rows-[minmax(0,1fr)]"
+            : "grid gap-6 md:grid-cols-[220px_1fr] lg:h-full lg:min-h-0 lg:grid-rows-[minmax(0,1fr)]"
+          : "flex flex-col lg:h-full lg:min-h-0"
       }
     >
       {showFilters && (
-        <aside className="flex flex-col gap-6">
+        <aside
+          ref={leftSidebarRef}
+          className="flex flex-col gap-6 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+        >
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium">Filters</h2>
+            <h2 className="flex items-center gap-2 text-sm font-medium">
+              <Compass className="size-4" />
+              Browse
+            </h2>
             {hasActiveFilters && (
               <button
                 type="button"
@@ -152,6 +218,44 @@ function ProjectsView({
                 Clear
               </button>
             )}
+          </div>
+
+          <div>
+            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              Categories
+            </h3>
+            <div className="flex max-h-48 flex-col gap-2 overflow-y-auto pr-1">
+              <label className="flex cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="radio"
+                  name="project-category"
+                  checked={!selectedCategory}
+                  onChange={() => setSelectedCategory("")}
+                  className="size-4 accent-primary"
+                />
+                <span>All categories</span>
+              </label>
+              {categories.map((category) => (
+                <label
+                  key={category}
+                  className="flex cursor-pointer items-center gap-2 text-sm"
+                >
+                  <input
+                    type="radio"
+                    name="project-category"
+                    checked={selectedCategory === category}
+                    onChange={() => setSelectedCategory(category)}
+                    className="size-4 accent-primary"
+                  />
+                  <span>{category}</span>
+                </label>
+              ))}
+              {categories.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No categories yet.
+                </p>
+              )}
+            </div>
           </div>
 
           <div>
@@ -229,7 +333,11 @@ function ProjectsView({
         </aside>
       )}
 
-      <div className="flex flex-col gap-4">
+      <div
+        ref={centerScrollRef}
+        className="flex flex-col gap-4 lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain"
+      >
+        {hero}
         <div className="flex min-w-0 items-center gap-2">
           <div className="relative max-w-sm min-w-0 flex-1">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -269,8 +377,21 @@ function ProjectsView({
           </Select>
         </div>
 
-        <ProjectsGrid projects={sorted} onTagClick={setQuery} />
+        <ProjectsGrid
+          projects={sorted}
+          onTagClick={setQuery}
+          onCategoryClick={setSelectedCategory}
+        />
       </div>
+
+      {showFilters && sidebar && (
+        <div
+          ref={rightSidebarRef}
+          className="md:col-span-2 lg:col-span-1 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+        >
+          {sidebar}
+        </div>
+      )}
     </div>
   )
 }
