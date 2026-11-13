@@ -56,7 +56,7 @@ While developing open source projects, one day I came up with the idea of ​​
 On the main page, each published project is presented as a card featuring relevant images and project information. The platform also tracks views and upvotes, which are displayed on the card as well. Visitors can:
 
 - Search by name, description, or tag
-- Browse by project category (up to five categories per project)
+- Choose categories for projects
 - Filter by status (`New`, added within the last 14 days) or `Premium`
 - Filter by one or more tags
 - Sort by newest/oldest, most upvoted, or most viewed
@@ -171,11 +171,11 @@ public         Static assets, including the site logo and preview image
 
 ### Prerequisites
 
-| Requirement      | Version                                                                                         |
-| ---------------- | ----------------------------------------------------------------------------------------------- |
-| Node.js          | 20+                                                                                             |
-| npm              | 10+                                                                                             |
-| Supabase project | with the `projects`, `project_embeds`, `project_upvotes`, and `project_bookmarks` tables set up |
+| Requirement      | Version                                                                                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js          | 20+                                                                                                                                                              |
+| npm              | 10+                                                                                                                                                              |
+| Supabase project | with the `projects`, `categories`, `project_embeds`, `project_upvotes`, and `project_bookmarks` tables set up; apply the SQL migrations in `supabase/migrations` |
 
 ### Quick start
 

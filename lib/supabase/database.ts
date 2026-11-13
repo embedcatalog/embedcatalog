@@ -1,6 +1,20 @@
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          name: string
+          created_at: string
+        }
+        Insert: {
+          name: string
+          created_at?: string
+        }
+        Update: {
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string

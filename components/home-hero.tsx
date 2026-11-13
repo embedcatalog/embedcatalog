@@ -10,7 +10,7 @@ async function getCommunity() {
   const supabase = createPublicServerClient()
   const { data, error } = await supabase
     .from("projects")
-    .select("name, github_url, socials")
+    .select("slug, name, github_url, socials")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(100)
@@ -21,8 +21,10 @@ async function getCommunity() {
   }
 
   const repositories = []
-  const seenRepositories = new Set<string>()
+  const seenOwners = new Set<string>()
   for (const project of data ?? []) {
+    if (project.slug.toLowerCase() === "hmpl") continue
+
     const githubUrl = project.github_url ?? project.socials?.github
     if (!githubUrl) continue
 
@@ -34,11 +36,11 @@ async function getCommunity() {
 
       const [owner, repository] = url.pathname.split("/").filter(Boolean)
       if (!owner || !repository) continue
-      const key = `${owner}/${repository}`.toLowerCase()
-      if (seenRepositories.has(key)) continue
-      seenRepositories.add(key)
+      const ownerKey = owner.toLowerCase()
+      if (seenOwners.has(ownerKey)) continue
+      seenOwners.add(ownerKey)
       repositories.push({
-        key,
+        key: ownerKey,
         name: project.name,
         avatarUrl: `https://github.com/${owner}.png?size=64`,
       })

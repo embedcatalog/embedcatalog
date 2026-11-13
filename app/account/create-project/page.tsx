@@ -19,6 +19,7 @@ import { Input } from "components/ui/input"
 import { Label } from "components/ui/label"
 import { Textarea } from "components/ui/textarea"
 import { ProjectInfoMarkdown } from "components/project-info-markdown"
+import { ProjectCategoryPicker } from "components/project-category-picker"
 import { supabase } from "lib/supabase/client"
 import { bindGithubRepo } from "lib/embed-variables"
 import { isValidEmbedSlug, slugifyEmbed } from "lib/standalone-embed-slug"
@@ -268,24 +269,15 @@ function CreateProjectPage() {
                   maxLength={80}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="project-categories">Categories</Label>
-                <Input
-                  id="project-categories"
-                  value={categoriesInput}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      categoriesInput: event.target.value,
-                    }))
-                  }
-                  placeholder="Developer tools, Productivity"
-                  maxLength={224}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Comma-separated list, up to {MAX_PROJECT_CATEGORIES}.
-                </p>
-              </div>
+              <ProjectCategoryPicker
+                categories={parseProjectCategories(categoriesInput)}
+                onChange={(categories) =>
+                  setDraft((current) => ({
+                    ...current,
+                    categoriesInput: categories.join(", "),
+                  }))
+                }
+              />
               <div className="grid gap-2">
                 <Label htmlFor="project-tags">Tags</Label>
                 <Input

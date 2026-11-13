@@ -4,6 +4,7 @@ import { Suspense } from "react"
 import { HomeHero } from "components/home-hero"
 import { NewEmbeds } from "components/new-embeds"
 import { ProjectsPage } from "components/projects-page"
+import { TopCreatorsWidget } from "components/top-creators-widget"
 import { siteConfig } from "lib/site"
 
 export const revalidate = 300
@@ -47,7 +48,15 @@ export default function Page() {
   return (
     <main className="site-container py-10 lg:h-[calc(100dvh-3.5rem)] lg:overflow-hidden lg:overscroll-none lg:py-6">
       <Suspense fallback={null}>
-        <ProjectsPage hero={<HomeHero />} sidebar={<NewEmbeds />} />
+        <ProjectsPage
+          hero={<HomeHero />}
+          sidebar={
+            <div className="flex flex-col gap-8">
+              <NewEmbeds />
+              <TopCreatorsWidget />
+            </div>
+          }
+        />
       </Suspense>
     </main>
   )

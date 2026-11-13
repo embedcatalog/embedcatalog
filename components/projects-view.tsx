@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { Compass, Search, X } from "lucide-react"
+import { CircleDot, Compass, Search, Shapes, Tag, X } from "lucide-react"
 
 import { Input } from "components/ui/input"
 import {
@@ -23,6 +23,8 @@ function parseTagsParam(value: string | null) {
 
 function ProjectsView({
   projects,
+  availableCategories = [],
+  categoriesError,
   showFilters = true,
   hero,
   sidebar,
@@ -31,6 +33,8 @@ function ProjectsView({
   rightSidebarRef,
 }: {
   projects: Project[]
+  availableCategories?: string[]
+  categoriesError?: string | null
   showFilters?: boolean
   hero?: React.ReactNode
   sidebar?: React.ReactNode
@@ -82,7 +86,15 @@ function ProjectsView({
       "",
       queryString ? `${pathname}?${queryString}` : pathname
     )
-  }, [query, newOnly, premiumOnly, selectedCategory, selectedTags, sort, pathname])
+  }, [
+    query,
+    newOnly,
+    premiumOnly,
+    selectedCategory,
+    selectedTags,
+    sort,
+    pathname,
+  ])
 
   const categories = React.useMemo(() => {
     const categoriesByName = new Map<string, string>()
@@ -95,10 +107,17 @@ function ProjectsView({
         }
       }
     }
+    for (const category of availableCategories) {
+      const value = category.trim()
+      const key = value.toLowerCase()
+      if (value && !categoriesByName.has(key)) {
+        categoriesByName.set(key, value)
+      }
+    }
     return Array.from(categoriesByName.values()).sort((a, b) =>
       a.localeCompare(b)
     )
-  }, [projects])
+  }, [availableCategories, projects])
   const allTags = React.useMemo(() => {
     const tags = new Set<string>()
     for (const project of projects) {
@@ -202,7 +221,7 @@ function ProjectsView({
       {showFilters && (
         <aside
           ref={leftSidebarRef}
-          className="flex flex-col gap-6 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+          className="flex flex-col gap-6 lg:max-h-[calc(100dvh-6.5rem)] lg:overflow-y-auto lg:overscroll-contain"
         >
           <div className="flex items-center justify-between">
             <h2 className="flex items-center gap-2 text-sm font-medium">
@@ -221,9 +240,15 @@ function ProjectsView({
           </div>
 
           <div>
-            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <h3 className="mb-2 flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <Shapes className="size-3.5" aria-hidden="true" />
               Categories
             </h3>
+            {categoriesError && (
+              <p className="mb-2 text-xs text-destructive" role="alert">
+                Could not load all categories: {categoriesError}
+              </p>
+            )}
             <div className="flex max-h-48 flex-col gap-2 overflow-y-auto pr-1">
               <label className="flex cursor-pointer items-center gap-2 text-sm">
                 <input
@@ -259,7 +284,8 @@ function ProjectsView({
           </div>
 
           <div>
-            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <h3 className="mb-2 flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <CircleDot className="size-3.5" aria-hidden="true" />
               Status
             </h3>
             <label className="flex cursor-pointer items-center gap-2 text-sm">
@@ -283,7 +309,8 @@ function ProjectsView({
           </div>
 
           <div>
-            <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <h3 className="mb-2 flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <Tag className="size-3.5" aria-hidden="true" />
               Tags
             </h3>
             <Input
@@ -387,7 +414,7 @@ function ProjectsView({
       {showFilters && sidebar && (
         <div
           ref={rightSidebarRef}
-          className="md:col-span-2 lg:col-span-1 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+          className="md:col-span-2 lg:col-span-1 lg:max-h-[calc(100dvh-6.5rem)] lg:overflow-y-auto lg:overscroll-contain"
         >
           {sidebar}
         </div>

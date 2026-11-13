@@ -37,7 +37,7 @@ function ProjectsSkeleton({
     >
       <aside
         ref={leftSidebarRef}
-        className="flex flex-col gap-6 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+        className="flex flex-col gap-6 lg:max-h-[calc(100dvh-6.5rem)] lg:overflow-y-auto lg:overscroll-contain"
       >
         <div className="flex items-center justify-between">
           <SkeletonBlock className="h-4 w-16" />
@@ -96,7 +96,7 @@ function ProjectsSkeleton({
       {sidebar && (
         <div
           ref={rightSidebarRef}
-          className="md:col-span-2 lg:col-span-1 lg:max-h-[calc(100dvh-6.5rem)] lg:overscroll-contain lg:overflow-y-auto"
+          className="md:col-span-2 lg:col-span-1 lg:max-h-[calc(100dvh-6.5rem)] lg:overflow-y-auto lg:overscroll-contain"
         >
           {sidebar}
         </div>
@@ -167,11 +167,20 @@ function ProjectsPage({
   const leftSidebarRef = React.useRef<HTMLElement>(null)
   const rightSidebarRef = React.useRef<HTMLDivElement>(null)
   const [projects, setProjects] = React.useState<Project[]>([])
+  const [availableCategories, setAvailableCategories] = React.useState<
+    string[]
+  >([])
+  const [categoriesError, setCategoriesError] = React.useState<string | null>(
+    null
+  )
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
     function handleWheel(event: WheelEvent) {
-      if (!window.matchMedia("(min-width: 64rem)").matches || event.deltaY === 0) {
+      if (
+        !window.matchMedia("(min-width: 64rem)").matches ||
+        event.deltaY === 0
+      ) {
         return
       }
 
@@ -219,6 +228,20 @@ function ProjectsPage({
     let cancelled = false
 
     supabase
+      .from("categories")
+      .select("name")
+      .order("name")
+      .then(({ data, error }) => {
+        if (cancelled) return
+        if (error) {
+          console.error("Failed to load project categories:", error.message)
+          setCategoriesError(error.message)
+          return
+        }
+        setAvailableCategories(data.map((category) => category.name))
+      })
+
+    supabase
       .from("projects")
       .select(
         "id, slug, name, description, url, github_url, github_stars, github_forks, github_contributors, github_license, github_stats_updated_at, categories, images, tags, socials, info, is_premium, impressions_count, upvotes_count, created_at"
@@ -236,41 +259,27 @@ function ProjectsPage({
     }
   }, [])
 
-  const centerHeader = (
-    <>
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">
-          Projects{" "}
-          {!loading && (
-            <span className="font-normal text-muted-foreground">
-              ({projects.length})
-            </span>
-          )}
-        </h2>
-      </div>
-      {hero}
-    </>
-  )
+  const centerHeader = hero
 
-  return (
-    loading ? (
-      <ProjectsSkeleton
-        hero={centerHeader}
-        sidebar={sidebar}
-        centerScrollRef={centerScrollRef}
-        leftSidebarRef={leftSidebarRef}
-        rightSidebarRef={rightSidebarRef}
-      />
-    ) : (
-      <ProjectsView
-        projects={projects}
-        hero={centerHeader}
-        sidebar={sidebar}
-        centerScrollRef={centerScrollRef}
-        leftSidebarRef={leftSidebarRef}
-        rightSidebarRef={rightSidebarRef}
-      />
-    )
+  return loading ? (
+    <ProjectsSkeleton
+      hero={centerHeader}
+      sidebar={sidebar}
+      centerScrollRef={centerScrollRef}
+      leftSidebarRef={leftSidebarRef}
+      rightSidebarRef={rightSidebarRef}
+    />
+  ) : (
+    <ProjectsView
+      projects={projects}
+      availableCategories={availableCategories}
+      categoriesError={categoriesError}
+      hero={centerHeader}
+      sidebar={sidebar}
+      centerScrollRef={centerScrollRef}
+      leftSidebarRef={leftSidebarRef}
+      rightSidebarRef={rightSidebarRef}
+    />
   )
 }
 
