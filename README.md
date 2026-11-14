@@ -208,15 +208,15 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ### Available scripts
 
-| Script              | What it does                                       |
-| ------------------- | -------------------------------------------------- |
-| `npm run start`     | Runs the app in development mode                   |
-| `npm run build`     | Builds Next.js; embed PNGs are rendered on request |
-| `npm run serve`     | Runs the production Next.js server                 |
-| `npm run prod`      | Alias for `build`, used by Vercel                  |
-| `npm run lint`      | Runs ESLint                                        |
-| `npm run format`    | Formats the codebase with Prettier                 |
-| `npm run typecheck` | Runs the TypeScript compiler in `--noEmit` mode    |
+| Script              | What it does                                    |
+| ------------------- | ----------------------------------------------- |
+| `npm run start`     | Runs the app in development mode                |
+| `npm run build`     | Builds Next.js; embed PNGs render on request    |
+| `npm run serve`     | Runs the production Next.js server              |
+| `npm run prod`      | Alias for `build`, used by Vercel               |
+| `npm run lint`      | Runs ESLint                                     |
+| `npm run format`    | Formats the codebase with Prettier              |
+| `npm run typecheck` | Runs the TypeScript compiler in `--noEmit` mode |
 
 ### Deployment
 

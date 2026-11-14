@@ -154,6 +154,21 @@ function ProjectDetail({
         />
         <p className="mt-6 leading-relaxed">{project.description}</p>
 
+        <ProjectInfoMarkdown content={project.info} />
+
+        <div className="mt-6">
+          <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Tags
+          </h2>
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.map((tag) => (
+              <Embed key={tag} variant="outline" asChild>
+                <Link href={`/?q=${encodeURIComponent(tag)}`}>{tag}</Link>
+              </Embed>
+            ))}
+          </div>
+        </div>
+
         {project.categories && project.categories.length > 0 && (
           <div className="mt-6">
             <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
@@ -170,21 +185,6 @@ function ProjectDetail({
             </div>
           </div>
         )}
-
-        <ProjectInfoMarkdown content={project.info} />
-
-        <div className="mt-6">
-          <h2 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Tags
-          </h2>
-          <div className="flex flex-wrap gap-1.5">
-            {project.tags.map((tag) => (
-              <Embed key={tag} variant="outline" asChild>
-                <Link href={`/?q=${encodeURIComponent(tag)}`}>{tag}</Link>
-              </Embed>
-            ))}
-          </div>
-        </div>
       </div>
     </main>
   )

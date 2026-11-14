@@ -274,6 +274,8 @@ export default function AboutPage() {
           </section>
 
           <section>
+            <div id="embeds"></div>
+            <div style={{ marginBottom: 60 }}></div>
             <h2 className="text-lg font-semibold">Embeds</h2>
             <p className="mt-2 leading-relaxed text-muted-foreground">
               The platform currently has the following list of embeds:
