@@ -125,6 +125,20 @@ function Footer() {
               subscriberCount={false}
               className="mt-5 max-w-sm"
             />
+            <div className="mt-5">
+              <a
+                href="https://www.producthunt.com/products/embedcatalog?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-embedcatalog"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  alt="EmbedCatalog - Decorate your project with embed | Product Hunt"
+                  width={250}
+                  height={54}
+                  src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1316650&amp;theme=neutral&amp;t=1794737888904"
+                />
+              </a>
+            </div>
           </div>
 
           {footerGroups.map((group) => (
@@ -144,21 +158,6 @@ function Footer() {
               </ul>
             </nav>
           ))}
-        </div>
-
-        <div className="mt-6 flex justify-center">
-          <a
-            href="https://www.producthunt.com/products/embedcatalog?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-embedcatalog"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              alt="EmbedCatalog - Decorate your project with embed | Product Hunt"
-              width={250}
-              height={54}
-              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1316650&amp;theme=neutral&amp;t=1794737888904"
-            />
-          </a>
         </div>
 
         <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
