@@ -58,7 +58,7 @@ function HomeHero() {
           href="/submit"
           className="transition-colors hover:text-foreground"
         >
-          <span className="font-medium">Join 10 projects</span>
+          <span className="font-medium">Join 10+ projects</span>
         </Link>
       </div>
       <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
